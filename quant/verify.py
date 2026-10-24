@@ -34,7 +34,8 @@ PROMPT_RENDERED = (
 vllm_image = (
     modal.Image.debian_slim(python_version="3.12")
     .uv_pip_install("vllm==0.32.0", "transformers==5.17.0", "huggingface_hub[hf_xet]")
-    .env({"HF_HOME": config.HF_HOME})
+    # FlashInfer's sampler JIT-compiles with nvcc, which debian_slim lacks; use vLLM's own sampler.
+    .env({"HF_HOME": config.HF_HOME, "VLLM_USE_FLASHINFER_SAMPLER": "0"})
     .add_local_python_source("quant")
 )
 
