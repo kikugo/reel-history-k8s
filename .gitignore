@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.env
+.env.*
+.claude/settings.local.json
+# model weights never go in git; they live on the Modal Volume and Hugging Face
+*.safetensors
+*.gguf
+models/

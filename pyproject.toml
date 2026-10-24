@@ -1,0 +1,13 @@
+[project]
+name = "reel-history-k8s"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "modal>=1.6.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.17.2",
+]
