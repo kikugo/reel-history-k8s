@@ -10,3 +10,6 @@ __pycache__/
 *.safetensors
 *.gguf
 models/
+
+# smoke-run records are throwaway
+results/quant/*_smoke.json
