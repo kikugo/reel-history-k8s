@@ -1,0 +1,33 @@
+{
+  "method": "gguf",
+  "smoke": false,
+  "base_model": "Qwen/Qwen3-8B",
+  "base_revision": "b968826d9c46dd6066d109eabc6255188de91218",
+  "output_dir": "/vol/models/Qwen3-8B-GGUF",
+  "started_utc": "2026-10-25T20:10:09+00:00",
+  "finished_utc": "2026-10-25T20:11:54+00:00",
+  "timings_s": {
+    "convert_s": 59,
+    "quantize_s": 38,
+    "other_s": 0.0
+  },
+  "wall_clock_s": 97.0,
+  "hardware": {
+    "requested_gpu": null,
+    "gpu_name": "none",
+    "cpu_cores": 8,
+    "mem_gib": 32
+  },
+  "cost_usd": 0.0171,
+  "price_source": {
+    "url": "https://modal.com/pricing",
+    "date": "2026-10-24"
+  },
+  "quant_type": "Q4_K_M",
+  "llama_cpp_tag": "v0.7.0",
+  "imatrix": false,
+  "file_bytes": {
+    "f16": 16388044192,
+    "quant": 5027784096
+  }
+}

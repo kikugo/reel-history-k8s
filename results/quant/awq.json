@@ -1,0 +1,54 @@
+{
+  "method": "awq",
+  "smoke": false,
+  "base_model": "Qwen/Qwen3-8B",
+  "base_revision": "b968826d9c46dd6066d109eabc6255188de91218",
+  "output_dir": "/vol/models/Qwen3-8B-W4A16-AWQ",
+  "started_utc": "2026-10-25T20:10:16+00:00",
+  "finished_utc": "2026-10-25T20:30:05+00:00",
+  "timings_s": {
+    "load_s": 4.2,
+    "calibrate_s": 1163.9,
+    "save_s": 21.1
+  },
+  "wall_clock_s": 1189.2,
+  "hardware": {
+    "requested_gpu": "A100",
+    "gpu_name": "NVIDIA A100-SXM4-40GB",
+    "cpu_cores": 8,
+    "mem_gib": 64
+  },
+  "cost_usd": 0.9869,
+  "price_source": {
+    "url": "https://modal.com/pricing",
+    "date": "2026-10-24"
+  },
+  "calibration": {
+    "dataset": "perfectblend",
+    "hf_dataset": "mlabonne/open-perfectblend",
+    "split": "train[:512]",
+    "num_samples": 512,
+    "max_seq_length": 2048,
+    "seed": 42
+  },
+  "recipe": {
+    "awq": {
+      "duo_scaling": "both"
+    },
+    "quant": {
+      "targets": [
+        "Linear"
+      ],
+      "scheme": "W4A16_ASYM",
+      "ignore": [
+        "lm_head"
+      ]
+    }
+  },
+  "versions": {
+    "llmcompressor": "0.14.0.1",
+    "compressed-tensors": "0.19.0",
+    "torch": "2.13.0",
+    "transformers": "5.17.0"
+  }
+}

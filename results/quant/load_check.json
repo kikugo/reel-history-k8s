@@ -1,0 +1,73 @@
+{
+  "smoke": false,
+  "started_utc": "2026-10-25T20:30:32+00:00",
+  "prompt": "In one sentence, why might someone who loved Am\u00e9lie enjoy Cinema Paradiso?",
+  "max_new_tokens": 32,
+  "all_loaded": true,
+  "checks": [
+    {
+      "variant": "awq",
+      "path": "/vol/models/Qwen3-8B-W4A16-AWQ",
+      "engine": "vllm",
+      "loaded": true,
+      "output": "Because both films celebrate the magic of cinema and the emotional connections between people through the art of storytelling.",
+      "prompt_matches_expected": true,
+      "quant_method": "compressed-tensors",
+      "quant_format": "pack-quantized",
+      "seconds": 168.1,
+      "gpu_name": "NVIDIA L4",
+      "cost_usd": 0.0581,
+      "versions": {
+        "vllm": "0.32.0",
+        "torch": "2.13.0",
+        "transformers": "5.17.0"
+      }
+    },
+    {
+      "variant": "gptq",
+      "path": "/vol/models/Qwen3-8B-W4A16-GPTQ",
+      "engine": "vllm",
+      "loaded": true,
+      "output": "Because both *Am\u00e9lie* and *Cinema Paradiso* celebrate the magic of cinema and the emotional connection between film and human experience.",
+      "prompt_matches_expected": true,
+      "quant_method": "compressed-tensors",
+      "quant_format": "pack-quantized",
+      "seconds": 179.2,
+      "gpu_name": "NVIDIA L4",
+      "cost_usd": 0.0619,
+      "versions": {
+        "vllm": "0.32.0",
+        "torch": "2.13.0",
+        "transformers": "5.17.0"
+      }
+    },
+    {
+      "variant": "bf16",
+      "path": "/__modal/volumes/vo-6aWJK7LNlYBkSDwESEifLv/hf/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218",
+      "engine": "vllm",
+      "loaded": true,
+      "output": "Because both films capture the warmth of human connection and the magic of cinema, offering a heartfelt celebration of love, memory, and the art of filmmaking.",
+      "prompt_matches_expected": true,
+      "quant_method": null,
+      "quant_format": null,
+      "seconds": 168.5,
+      "gpu_name": "NVIDIA L4",
+      "cost_usd": 0.0582,
+      "versions": {
+        "vllm": "0.32.0",
+        "torch": "2.13.0",
+        "transformers": "5.17.0"
+      }
+    },
+    {
+      "variant": "gguf",
+      "path": "/vol/models/Qwen3-8B-GGUF/Qwen3-8B-Q4_K_M.gguf",
+      "engine": "llama.cpp",
+      "loaded": true,
+      "output": "Someone who loved *Am\u00e9lie* might enjoy *Cinema Paradiso* because both films celebrate the magic of cinema and the emotional depth of storytelling through the",
+      "seconds": 20.8,
+      "cost_usd": 0.0026,
+      "llama_cpp_tag": "v0.7.0"
+    }
+  ]
+}
