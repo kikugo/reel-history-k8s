@@ -1,0 +1,19 @@
+{
+  "variant": "bf16",
+  "ready": true,
+  "ready_s": 158.1,
+  "no_key_status": 401,
+  "status": 200,
+  "latency_s": 2.04,
+  "served_model": "qwen3-8b-bf16",
+  "reply": "Because both films capture the warmth of human connection and the magic of cinema, offering a heartfelt celebration of love, memory, and the art of filmmaking.",
+  "usage": {
+    "prompt_tokens": 29,
+    "total_tokens": 61,
+    "completion_tokens": 32,
+    "prompt_tokens_details": null,
+    "completion_tokens_details": null
+  },
+  "finished_utc": "2026-10-25T21:52:22+00:00",
+  "passed": true
+}

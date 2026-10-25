@@ -1,0 +1,19 @@
+{
+  "variant": "awq",
+  "ready": true,
+  "ready_s": 237.1,
+  "no_key_status": 401,
+  "status": 200,
+  "latency_s": 0.64,
+  "served_model": "qwen3-8b-awq",
+  "reply": "Because both films celebrate the magic of cinema and the emotional connections between people through the art of storytelling.",
+  "usage": {
+    "prompt_tokens": 29,
+    "total_tokens": 50,
+    "completion_tokens": 21,
+    "prompt_tokens_details": null,
+    "completion_tokens_details": null
+  },
+  "finished_utc": "2026-10-25T21:48:24+00:00",
+  "passed": true
+}
