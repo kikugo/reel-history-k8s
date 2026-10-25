@@ -1,0 +1,31 @@
+You are judging two answers to the same request from a film recommender's explanation feature.
+
+The request asks the assistant to explain, in two or three sentences, why a user who loved some
+films would enjoy a candidate film, referring to specific films from the user's list.
+
+Judge which answer is better on these points, in this order:
+1. It answers in the language of the request (English or French).
+2. It is accurate about the films it mentions; invented plot details or wrong facts count against it.
+3. It connects the candidate to specific films from the user's list with a real reason (tone,
+   themes, genre, director, era), not just a list of genres.
+4. It respects the two-or-three-sentence length and reads naturally.
+
+Ignore which answer comes first. Do not prefer the longer answer for being longer.
+If neither is clearly better, answer "tie".
+
+Request:
+<<<
+{request}
+>>>
+
+Answer A:
+<<<
+{answer_a}
+>>>
+
+Answer B:
+<<<
+{answer_b}
+>>>
+
+Reply with JSON only: {{"winner": "A" | "B" | "tie", "reason": "<one short sentence>"}}
