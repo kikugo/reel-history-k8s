@@ -1,0 +1,17 @@
+explain_prompts.jsonl is derived from the MovieLens ml-latest-small dataset (film titles,
+years and genres only; no ratings are redistributed). It is shared under the same terms as
+the original dataset:
+
+- Use is for research and non-commercial purposes only. No commercial or revenue-bearing use
+  without permission from a faculty member of the GroupLens Research Project at the
+  University of Minnesota.
+- This project is not endorsed by the University of Minnesota or the GroupLens Research Group.
+- Redistribution, including transformations, must keep these same terms.
+
+Source: https://grouplens.org/datasets/movielens/ (ml-latest-small, sha256
+696d65a3dfceac7c45750ad32df2c259311949efec81f0f144fdfb91ebc9e436)
+
+Citation:
+F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context.
+ACM Transactions on Interactive Intelligent Systems (TiiS) 5, 4: 19:1-19:19.
+https://doi.org/10.1145/2827872

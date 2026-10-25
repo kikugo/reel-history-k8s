@@ -13,3 +13,6 @@ models/
 
 # smoke-run records are throwaway
 results/quant/*_smoke.json
+
+# downloaded source data
+data/raw/
