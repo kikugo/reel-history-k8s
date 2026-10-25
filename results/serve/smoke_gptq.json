@@ -1,0 +1,19 @@
+{
+  "variant": "gptq",
+  "ready": true,
+  "ready_s": 280.1,
+  "no_key_status": 401,
+  "status": 200,
+  "latency_s": 0.71,
+  "served_model": "qwen3-8b-gptq",
+  "reply": "Because both *Amélie* and *Cinema Paradiso* celebrate the magic of cinema and the emotional connection between film and human experience.",
+  "usage": {
+    "prompt_tokens": 29,
+    "total_tokens": 59,
+    "completion_tokens": 30,
+    "prompt_tokens_details": null,
+    "completion_tokens_details": null
+  },
+  "finished_utc": "2026-10-25T21:49:06+00:00",
+  "passed": true
+}

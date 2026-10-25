@@ -26,3 +26,12 @@ uv run modal run -m quant.verify          # every variant loads and generates
 ```
 
 Each run writes its settings, wall-clock time and compute cost to `results/quant/`.
+
+The quantized models are public on Hugging Face: [AWQ](https://huggingface.co/karthikcr/Qwen3-8B-W4A16-AWQ), [GPTQ](https://huggingface.co/karthikcr/Qwen3-8B-W4A16-GPTQ), [GGUF](https://huggingface.co/karthikcr/Qwen3-8B-GGUF).
+
+```bash
+# Phase 2: serve a variant (bf16, awq or gptq) with vLLM on an L4, scaled to zero when idle.
+# Needs a Modal secret with the API key the server checks:
+modal secret create vllm-api-key VLLM_API_KEY=$(openssl rand -hex 32)
+VARIANT=awq uv run modal run -m serve.smoke   # one keyed chat request, one without the key
+```
