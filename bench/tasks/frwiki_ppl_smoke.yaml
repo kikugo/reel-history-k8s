@@ -1,0 +1,18 @@
+# French Wikipedia perplexity, modelled on lm-eval's wikitext task.
+# The slice is built by bench/ppl.py (build_fr_slice) and lives on the c2-models Volume.
+task: frwiki_ppl_smoke
+dataset_path: json
+dataset_kwargs:
+  data_files:
+    test: /vol/data/frwiki_slice_smoke.jsonl
+output_type: loglikelihood_rolling
+test_split: test
+doc_to_text: ""
+doc_to_target: "{{page}}"
+process_results: !function frwiki.process_results
+metric_list:
+  - metric: word_perplexity
+  - metric: byte_perplexity
+  - metric: bits_per_byte
+metadata:
+  version: 1.0
