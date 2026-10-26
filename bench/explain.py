@@ -19,6 +19,7 @@ from bench.common import (
     BENCH_MEM_GIB,
     VOLUMES,
     app,
+    gguf_image,
     load_prompts,
     local_vllm,
     vllm_image,
@@ -26,7 +27,7 @@ from bench.common import (
 )
 from quant import config
 from quant.common import gpu_name, package_versions
-from quant.gguf import LLAMA_CPP_DIR, llama_cpp_image
+from quant.gguf import LLAMA_CPP_DIR
 from serve.variants import served_name
 
 MAX_TOKENS = 200
@@ -81,7 +82,7 @@ def explain_gpu(variant: str, prompts: list[dict]) -> dict:
     }
 
 
-@app.function(image=llama_cpp_image, cpu=GGUF_CPU, memory=GGUF_MEM_GIB * 1024, volumes=VOLUMES, timeout=60 * 60)
+@app.function(image=gguf_image, cpu=GGUF_CPU, memory=GGUF_MEM_GIB * 1024, volumes=VOLUMES, timeout=60 * 60)
 def explain_gguf(prompts: list[dict]) -> dict:
     model = f"{config.MODELS_DIR}/{config.OUTPUT_NAMES['gguf']}/{config.MODEL_NAME}-{config.GGUF_QUANT}.gguf"
     answers = []

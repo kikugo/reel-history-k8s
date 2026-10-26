@@ -9,6 +9,7 @@ from pathlib import Path
 import modal
 
 from quant import config
+from quant.gguf import llama_cpp_image
 
 app = modal.App("c2-bench")
 models = modal.Volume.from_name("c2-models")
@@ -30,6 +31,9 @@ vllm_image = (
     .env({"HF_HOME": config.HF_HOME, "VLLM_USE_FLASHINFER_SAMPLER": "0"})
     .add_local_python_source("quant", "serve", "bench")
 )
+
+# Phase 1 llama.cpp build, plus this repo's packages that the GGUF steps import.
+gguf_image = llama_cpp_image.add_local_python_source("serve", "bench")
 
 _WEIGHTS = re.compile(r"Model loading took ([\d.]+) GiB")
 _KV_MEM = re.compile(r"Available KV cache memory: ([\d.]+) GiB")

@@ -9,9 +9,9 @@ import subprocess
 import time
 from datetime import UTC, datetime
 
-from bench.common import VOLUMES, app, write_result
+from bench.common import VOLUMES, app, gguf_image, write_result
 from quant import config
-from quant.gguf import LLAMA_CPP_DIR, llama_cpp_image
+from quant.gguf import LLAMA_CPP_DIR
 
 CPU = 8
 MEM_GIB = 16
@@ -38,7 +38,7 @@ def summarize(rows: list[dict]) -> dict:
     return out
 
 
-@app.function(image=llama_cpp_image, cpu=CPU, memory=MEM_GIB * 1024, volumes=VOLUMES, timeout=30 * 60)
+@app.function(image=gguf_image, cpu=CPU, memory=MEM_GIB * 1024, volumes=VOLUMES, timeout=30 * 60)
 def run_llama_bench(smoke: bool) -> dict:
     model = f"{config.MODELS_DIR}/{config.OUTPUT_NAMES['gguf']}/{config.MODEL_NAME}-{config.GGUF_QUANT}.gguf"
     t0 = time.perf_counter()
