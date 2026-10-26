@@ -66,7 +66,11 @@ def _ask(message: str) -> str:
     }
     req = urllib.request.Request(
         JUDGE_URL, data=json.dumps(body).encode(),
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"},
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {os.environ['GROQ_API_KEY']}",
+            "User-Agent": "reel-history-k8s-bench/0.1",  # Cloudflare rejects urllib's default agent
+        },
     )
     for attempt in range(6):
         try:
@@ -74,7 +78,8 @@ def _ask(message: str) -> str:
                 return json.loads(resp.read())["choices"][0]["message"]["content"]
         except urllib.error.HTTPError as err:
             if err.code != 429 and err.code < 500:
-                raise
+                # HTTPError holds a socket and can't cross the Modal boundary; keep status and body
+                raise RuntimeError(f"judge HTTP {err.code}: {err.read()[:500]!r}") from None
             time.sleep(2 ** attempt)
     raise RuntimeError("judge kept failing")
 
