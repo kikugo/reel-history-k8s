@@ -1,0 +1,266 @@
+{
+  "variant": "gguf",
+  "smoke": false,
+  "started_utc": "2026-10-26T04:35:59+00:00",
+  "n": 50,
+  "max_tokens": 200,
+  "engine": "llama.cpp",
+  "hardware": "8 CPU cores",
+  "concurrency": 1,
+  "generation_s": 554.8,
+  "generation_cost_usd": 0.0779,
+  "cost_per_1000_usd": 1.558,
+  "llama_cpp_tag": "v0.7.0",
+  "items": [
+    {
+      "id": "ml-7",
+      "lang": "en",
+      "answer": "This user would likely enjoy *A.I. Artificial Intelligence (2001)* because they have shown a preference for films that blend emotional depth with speculative themes, such as *Contact (1997)* and *Spider-Man 2 (2004)*, which also explore science and technology. Additionally, their appreciation for *Forrest Gump (1994)* and *Notting Hill (1999)* suggests a fondness for stories that balance heartfelt drama with imaginative elements, much like *A.I.* combines emotional storytelling with futuristic sci-fi concepts."
+    },
+    {
+      "id": "ml-27",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films mêlant humour et émotion, comme *The Princess Bride* et *Titanic*, et adore des histoires captivantes avec un mélange de comédie et d'aventure, comme *Back to the Future* et *The Sound of Music*. *Wallace & Gromit: The Wrong Trousers* combine ces éléments : une histoire drôle et bien construite, des personnages attachants, et une touche d'aventure, ce qui correspond parfaitement à ses goûts."
+    },
+    {
+      "id": "ml-29",
+      "lang": "en",
+      "answer": "This user would likely enjoy *The Man Who Would Be King* (1975) because they appreciate the blend of action and drama seen in *Django Unchained* and *The Godfather*, and they would be drawn to the epic storytelling and adventurous spirit found in *A Fistful of Dollars* and *X-Men: Days of Future Past*. The film’s mix of adventure, moral complexity, and cinematic grandeur aligns well with their taste for bold, genre-defying stories."
+    },
+    {
+      "id": "ml-32",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films dramatiques et psychologiques, comme *Six Degrees of Separation* et *Streetcar Named Desire*, qui explorent profondément les émotions humaines et les conflits intérieurs. Il est également sensible aux récits intenses et aux personnages complexes, comme dans *Pulp Fiction* et *Adventures of Priscilla, Queen of the Desert*. *The Silence of the Lambs* combine ces éléments avec une tension dramatique, une psychologie raffinée et une atmosphère sombre, ce qui en fait un choix naturel pour un spectateur qui aime ces thèmes."
+    },
+    {
+      "id": "ml-34",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Once Upon a Time in China (Wong Fei Hung)* (1991) because they have a strong affinity for action-packed films with a blend of martial arts and drama, similar to *X2: X-Men United* and *The Italian Job*. Additionally, the film's mix of adventure and historical storytelling resonates with their appreciation for *Final Fantasy: The Spirits Within* and *X-Men: The Last Stand*."
+    },
+    {
+      "id": "ml-47",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films intenses et profonds qui explorent les thèmes de la vie, des émotions et des défis humains, comme *Reign Over Me* et *Whiplash*. Il est également sensible aux récits de personnes en difficulté, comme dans *Jason's Lyric* et *The Green Mile*. *Half Nelson* (2006), un drama poignant sur la vie d’un professeur de musique en difficulté, s’inscrit dans cette même veine avec son approche sincère et émouvante, ce qui le rend probablement très proche de ses préférences."
+    },
+    {
+      "id": "ml-49",
+      "lang": "en",
+      "answer": "This user would likely enjoy *The Revenant* (2015) because they have a strong affinity for intense, character-driven dramas like *Cast Away* and *The Pursuit of Happyness*, which share *The Revenant*'s focus on perseverance and personal struggle. Additionally, their appreciation for sci-fi elements in films such as *Interstellar* and *Logan* aligns with the film's exploration of survival and human endurance in a harsh, natural environment."
+    },
+    {
+      "id": "ml-77",
+      "lang": "fr",
+      "answer": "Cet utilisateur aimerait probablement *The Dark Knight* (2008) car il apprécie les films d'action intenses et les récits épique, comme *Star Wars: Episode IV* et *Star Wars: Episode V*. De plus, *Batman Begins* partage le même genre d'action, de crime et d'ambiance sombre, ce qui suggère une affinité pour le style et le ton de *The Dark Knight*."
+    },
+    {
+      "id": "ml-87",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Monty Python and the Holy Grail* (1975) because they already appreciate dark humor and satirical takes on classic stories, as seen in *The Producers* and *Mystery Science Theater 3000: The Movie*. Additionally, the blend of comedy and fantasy in *Spirited Away* and *My Neighbor Totoro* aligns with the whimsical and absurd elements found in *Holy Grail*."
+    },
+    {
+      "id": "ml-88",
+      "lang": "fr",
+      "answer": "Cet utilisateur aimerait probablement *The Machinist* (2004) car il apprécie des films intenses et psychologiques, comme *No Country for Old Men* et *Inception*, qui mêlent suspense, tension dramatique et révélations inattendues. De plus, *The Machinist* partage avec *The Pianist* une atmosphère sombre et introspective, marquée par une quête de vérité et une exploration profonde de l'âme humaine."
+    },
+    {
+      "id": "ml-97",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Ocean's Eleven* (2001) because they have a strong affinity for crime and thriller films like *The Silence of the Lambs* and *Snatch*, which share similar elements of intricate plotting and suspense. Additionally, the film's blend of comedy and heist action aligns with their appreciation for *The Mummy Returns* and *Mexican*, making it a fitting recommendation."
+    },
+    {
+      "id": "ml-103",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent action, suspense et des thèmes profonds, comme *Reservoir Dogs* et *No Country for Old Men*. *Pirates of the Caribbean: At World's End* offre une combinaison de suspense, d'actions intenses et de récits complexes, ce qui correspond à son goût pour les histoires captivantes. De plus, il a aimé *The Truman Show*, qui mêle mystère et réflexion, et *Lost in Translation*, qui apporte une touche de romance et de drame, éléments qui s'alignent avec l'atmosphère et le style de ce film."
+    },
+    {
+      "id": "ml-104",
+      "lang": "en",
+      "answer": "This user would likely enjoy *You've Got Mail* (1998) because they already appreciate romantic comedies like *Four Weddings and a Funeral* and *My Best Friend's Wedding*, which share similar lighthearted humor and heartfelt romance. Additionally, the witty banter and charming characters in *You've Got Mail* would appeal to their taste for the clever, character-driven humor found in *Monty Python and the Holy Grail*."
+    },
+    {
+      "id": "ml-108",
+      "lang": "fr",
+      "answer": "Cet utilisateur aimerait probablement *Catch Me If You Can (2002)* car il apprécie les films qui mêlent drama et suspense, comme *Far from Heaven (2002)* et *Lone Star (1996)*. De plus, il semble attiré par des histoires complexes et nuancées, similaires à celles de *Rushmore (1998)* et *Lovely & Amazing (2001)*, ce qui correspond bien au style de *Catch Me If You Can*, un film qui combine intrigue, personnalité et émotion."
+    },
+    {
+      "id": "ml-112",
+      "lang": "en",
+      "answer": "This user would likely enjoy *The Dark Knight* because they appreciate high-stakes action and intense storytelling, similar to *Independence Day* and *Interstellar*. They also seem to enjoy complex characters and moral dilemmas, which are central to *The Green Mile* and *The Lord of the Rings: The Return of the King*."
+    },
+    {
+      "id": "ml-113",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie les films romantiques et dramatiques avec des éléments de mystère et de tension émotionnelle, comme *To Catch a Thief* et *American Beauty*. *Affair to Remember* partage ces traits avec une intrigue romantique complexe et une atmosphère dramatique, ce qui correspond à ses préférences. De plus, le style émotionnellement intense de *Man and a Woman, A* s'aligne également avec l'ambiance émotionnellement chargée de *Affair to Remember*."
+    },
+    {
+      "id": "ml-129",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Lord of the Rings: The Two Towers* because they appreciate epic adventure and fantasy, as seen in *The Princess Bride* and *Spirited Away*. They also enjoy complex storytelling and dramatic tension, which aligns with *Watership Down* and *Sin City*. The film's blend of action, fantasy, and intricate plot would resonate with their taste for immersive, high-stakes narratives."
+    },
+    {
+      "id": "ml-151",
+      "lang": "fr",
+      "answer": "Cet utilisateur aimerait probablement *Happy Gilmore (1996)* car il apprécie les comédies légères et les personnages atypiques, comme dans *Groundhog Day* et *Nutty Professor, The*. Il est également sensible aux éléments de fantasy et d'aventure, présents dans *Toy Story* et *Beavis and Butt-Head Do America*, ce qui correspond bien au style humoristique et à l'esprit de *Happy Gilmore*."
+    },
+    {
+      "id": "ml-171",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Star Wars: Episode VI - Return of the Jedi* because they appreciate thrilling, mystery-driven stories like *Seven* and *Vertigo*, which share *Return of the Jedi*'s suspenseful and emotionally complex narrative. Additionally, their love for musicals such as *The Blues Brothers* and *Willy Wonka & the Chocolate Factory* aligns with the film's iconic musical sequences and whimsical charm."
+    },
+    {
+      "id": "ml-191",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie les films qui mêlent humour et réflexion, comme *Ed Wood* et *Space Jam*, ainsi que les documentaires introspectifs tels que *Crumb* et *The Celluloid Closet*. *Taxi Driver* s'inscrit dans cette lignée en combinant une critique sociale acérée, une solitude profonde et une touche d'humour noir, ce qui pourrait le séduire tout comme *Ed Wood* ou *The Celluloid Closet*."
+    },
+    {
+      "id": "ml-196",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Spotlight* (2015) because they have a strong affinity for intense, character-driven dramas with real-world stakes, similar to *The Dark Knight* and *Shooter*. Additionally, their appreciation for tightly woven, suspenseful narratives aligns well with *Spotlight*'s investigative journalism style, much like the gripping, complex storytelling in *The Matrix* and *The Italian Job*."
+    },
+    {
+      "id": "ml-199",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent action, drama et des récits intenses, comme *Great Escape* et *Ben-Hur*, qui mettent en scène des combats héroïques et des personnages profonds. *Slap Shot* s'inscrit dans cette lignée avec son mélange de suspense, de rivalités intenses et de personnages marquants, tout en offrant une ambiance de hockey à la fois réaliste et dramatique, proche du style de *The Man Who Shot Liberty Valance*."
+    },
+    {
+      "id": "ml-234",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Bug's Life* because they already appreciate animated films with humor and adventure, similar to *Shrek* and *Inspector Gadget*. Additionally, the blend of comedy and fantasy in *Bug's Life* aligns with their taste for lighthearted, family-friendly stories like *E.T. the Extra-Terrestrial* and *The Lion King*."
+    },
+    {
+      "id": "ml-243",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie les films qui mêlent action, suspense et des thèmes profonds, comme *GoldenEye*, *Crimson Tide* et *Johnny Mnemonic*. *Mr. Holland's Opus* s'inscrit dans cette lignée en combinant tension dramatique et réflexion sur la vie et la musique, tout en partageant avec *Crimson Tide* une ambiance intense et introspective. De plus, comme *Speed* et *Johnny Mnemonic*, il propose une narration captivante qui mélange émotion et suspense."
+    },
+    {
+      "id": "ml-262",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Frankenstein* (1994) because they appreciate deep, character-driven dramas with moral complexity, a theme shared by *Dead Man Walking* and *Burnt by the Sun*. Additionally, the film's gothic atmosphere and exploration of human ambition and isolation resonate with the emotional depth found in *Persuasion* and *The Madness of King George*."
+    },
+    {
+      "id": "ml-265",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films de science-fiction et d'aventure avec des éléments de réflexion et de suspense, comme *Star Wars* et *The Matrix*. *It's a Wonderful Life* partage avec ces œuvres une dimension émotionnelle forte et une exploration des conséquences de nos choix, tout en mêlant action et réflexion. De plus, comme *Back to the Future*, il propose une quête d'identité et de sens, dans un cadre original et captivant."
+    },
+    {
+      "id": "ml-267",
+      "lang": "en",
+      "answer": "This user would likely enjoy *The Wizard of Oz* (1939) because they appreciate a mix of adventure and fantasy, similar to *Back to the Future* and *X-Files: Fight the Future, The*. They also enjoy lighthearted, whimsical storytelling, which aligns with the charm and magical elements found in *The Wizard of Oz*."
+    },
+    {
+      "id": "ml-273",
+      "lang": "fr",
+      "answer": "Cet utilisateur aimerait probablement *Clerks* (1994) car il apprécie les films indépendants et humoristiques comme *Ed Wood* et *Much Ado About Nothing*, qui mêlent drame et comédie. De plus, *Clerks* partage avec *Star Trek: Generations* une ambiance dramatique et introspective, tout en offrant une touche d'humour noir, ce qui correspond à son goût pour les films qui allient émotion et légèreté."
+    },
+    {
+      "id": "ml-279",
+      "lang": "en",
+      "answer": "This user would likely enjoy *The Thing* (1982) because they appreciate tense, atmospheric sci-fi thrillers like *Ex Machina* and *The Empire Strikes Back*, which share *The Thing*'s suspenseful and cerebral approach to its genre. Additionally, their taste for adventurous and dramatic films such as *The Revenant* and *Grand Budapest Hotel* aligns with *The Thing*'s gripping, survival-driven narrative and dark, immersive tone."
+    },
+    {
+      "id": "ml-286",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie à la fois des films de dessin animé comme *Finding Nemo* et des drames romantiques comme *Eternal Sunshine of the Spotless Mind*, ce qui suggère une ouverture à des histoires émouvantes et poétiques. De plus, il a aimé *Pulp Fiction* et *Memento*, qui sont des films de suspense et de récit non linéaire, ce qui pourrait l'attirer par la complexité narrative de *Ice Age*. Enfin, le mélange de comédie et d'aventure dans *Finding Nemo* pourrait lui plaire aussi dans *Ice Age*, qui allie humour et exploration."
+    },
+    {
+      "id": "ml-302",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Leaving Las Vegas (1995)* because they appreciate dramatic storytelling and complex characters, similar to *Sense and Sensibility* and *The Godfather: Part II*. Additionally, the film's introspective and emotionally intense tone aligns with the depth found in *Pulp Fiction* and *Jurassic Park*, which they also admire."
+    },
+    {
+      "id": "ml-327",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent émotion et réflexion, comme *Shawshank Redemption* et *Memento*, et qui explorent des thèmes profonds tels que la justice, la persévérance ou la quête de sens. *It's a Wonderful Life* partage ces mêmes préoccupations, en offrant une histoire touchante sur la valeur de la vie et l'importance des relations humaines, ce qui pourrait le séduire tout comme *Loser* ou *Departed, The*."
+    },
+    {
+      "id": "ml-340",
+      "lang": "en",
+      "answer": "This user would likely enjoy *The Shawshank Redemption* because they appreciate dramatic storytelling and themes of perseverance, which are present in *Braveheart* and *Apollo 13*. Additionally, the film's focus on human spirit and resilience aligns with the emotional depth found in *Batman* and *The Fugitive*."
+    },
+    {
+      "id": "ml-344",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent action, aventure et éléments fantastiques, comme *Star Wars: Episode IV* et *Princess Mononoke*. *Twister* (1996), qui combine action intense, aventure et un peu de science-fiction, s'inscrit dans ce registre. De plus, son goût pour des histoires dramatiques et intenses, comme dans *Watchmen*, le rendrait probablement sensible à l'émotion et à la tension de *Twister*."
+    },
+    {
+      "id": "ml-358",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Walk to Remember, A (2002)* because they have a strong affinity for romantic dramas with emotional depth, similar to *Tristan & Isolde (2006)* and *Atonement (2007)*. Additionally, the blend of romance and heartfelt storytelling in *Walk to Remember* mirrors the emotional intensity found in *The Time Traveler's Wife (2009)*, making it a fitting recommendation."
+    },
+    {
+      "id": "ml-364",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent action, suspense et des récits intenses, comme *Broken Arrow* et *Executive Decision*. Il est également sensible aux histoires complexes et aux personnages profonds, présents dans *Willy Wonka & the Chocolate Factory* et *Ransom*. *The Godfather* combine ces éléments avec une intrigue riche et des dialogues percutants, ce qui en fait une œuvre qui lui plairait probablement."
+    },
+    {
+      "id": "ml-414",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Waking Life* (2001) because they appreciate philosophical and introspective storytelling, as seen in *Twelve Monkeys* and *Royal Tenenbaums*. The film's blend of animation and surrealism also aligns with their taste for creative, thought-provoking works like *American Splendor* and *Ferris Bueller's Day Off*."
+    },
+    {
+      "id": "ml-418",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie les films dramatiques qui explorent les conflits intérieurs et les répercussions profondes des choix humains, comme *To Kill a Mockingbird* et *Social Network*. *The Butterfly Effect* s'inscrit dans cette lignée en abordant des thèmes similaires de causalité et de responsabilité, tout en mêlant suspense et introspection, ce qui rappelle le style de *Fight Club* et *Martha Marcy May Marlene*."
+    },
+    {
+      "id": "ml-422",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Sunset Blvd.* because they appreciate dramatic storytelling and complex characters, as seen in *One Flew Over the Cuckoo's Nest* and *Patton*. Additionally, their taste for classic, thought-provoking films aligns with *Sunset Blvd.*, which blends drama with a darkly humorous take on fame and obsession, much like *Goodfellas* and *Jaws* do in their own genres."
+    },
+    {
+      "id": "ml-439",
+      "lang": "fr",
+      "answer": "Cet utilisateur aimerait probablement *The Matrix* (1999) car il apprécie des films qui mêlent action et réflexion philosophique, comme *Die Hard* et *Raiders of the Lost Ark*, qui combinent des scènes intenses et des aventures palpitantes. De plus, *The Matrix* partage avec *The Lord of the Rings: The Fellowship of the Ring* une dimension épique et fantastique, tout en explorant des thèmes profonds, ce qui correspond à l’attirance pour des œuvres comme *Shawshank Redemption* et *Forrest Gump*, qui mêlent émotion et réflexion."
+    },
+    {
+      "id": "ml-443",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Braveheart* (1995) because they appreciate emotionally powerful dramas with historical depth, similar to *Shawshank Redemption* and *Silver Linings Playbook*. They also enjoy character-driven stories with strong emotional arcs, which aligns with the themes in *Forrest Gump* and *The Secret Life of Walter Mitty*."
+    },
+    {
+      "id": "ml-446",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie les films dramatiques profonds et émotionnels, comme *What's Eating Gilbert Grape* et *Philadelphia*, ainsi que des histoires qui mêlent émotion et réflexion, comme *Sense and Sensibility*. *Terminator 2: Judgment Day* offre une combinaison similaire : une intrigue intense, des thèmes de destin et de sacrifice, et une exploration des conséquences des actions humaines, ce qui pourrait lui rappeler l'émotion et la profondeur de *Philadelphia* ou *Schindler's List*."
+    },
+    {
+      "id": "ml-452",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Shakespeare in Love* (1998) because they appreciate dramatic storytelling and rich character development, similar to *What's Eating Gilbert Grape* (1993). Additionally, they may enjoy the blend of romance and historical intrigue in *Shakespeare in Love*, which parallels the complex, layered narratives found in *Blade Runner* (1982) and *Starship Troopers* (1997)."
+    },
+    {
+      "id": "ml-461",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent drama, comédie et des récits intenses, comme *Forrest Gump* ou *As Good as It Gets*. Il semble également attiré par des histoires marquantes et des personnages complexes, présents dans *Shawshank Redemption* et *Dead Poets Society*. *Wolf of Wall Street* s'inscrit dans cette lignée avec son récit captivant, ses personnages profonds et son mélange de comédie et de drama, ce qui le rend probablement très proche de ses préférences."
+    },
+    {
+      "id": "ml-463",
+      "lang": "en",
+      "answer": "This user would likely enjoy *Godfather: Part II* because they appreciate complex, character-driven dramas with deep moral themes, similar to *Saving Private Ryan* and *Lord of the Rings: The Return of the King*. They also seem to enjoy intricate storytelling and political intrigue, which are central to *Lord of the Rings: The Two Towers* and *Lord of the Rings: The Return of the King*, much like the layered narrative of *Godfather: Part II*."
+    },
+    {
+      "id": "ml-512",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent tension, suspense et des thèmes profonds, comme *Twelve Monkeys* et *Seven*. *Natural Born Killers* partage cette atmosphère de thriller intense et de réflexion sur la violence, tout en intégrant un style visuel et narratif audacieux, proche de *Die Hard: With a Vengeance* et *The Fugitive*. Il pourrait aussi être attiré par la complexité psychologique des personnages, similaire à celle de *The Silence of the Lambs*."
+    },
+    {
+      "id": "ml-515",
+      "lang": "en",
+      "answer": "This user would likely enjoy *The Shawshank Redemption* because they appreciate character-driven dramas with themes of perseverance and hope, similar to *Whiplash* and *The Imitation Game*. The film's focus on human spirit and resilience also aligns with the emotional depth found in *Schindler's List* and *Fight Club*."
+    },
+    {
+      "id": "ml-548",
+      "lang": "fr",
+      "answer": "Cet utilisateur apprécie des films qui mêlent action et réflexion, comme *The Dark Knight* (2008), ainsi que des dramas intenses et émotionnels tels que *Soul Food* (1997) et *Jerry Maguire* (1996). *The Matrix* (1999) combine à la fois des éléments d'action et de science-fiction, avec une profonde réflexion philosophique, ce qui correspond à son goût pour des œuvres à la fois stimulantes et intellectuellement enrichissantes."
+    },
+    {
+      "id": "ml-553",
+      "lang": "en",
+      "answer": "This user would likely enjoy *25th Hour (2002)* because they appreciate character-driven dramas with emotional depth, similar to *Do the Right Thing* and *Inside Man*. They also seem to enjoy films with strong narrative tension and moral complexity, which aligns with the themes in *Heat* and *Bourne Supremacy, The*."
+    },
+    {
+      "id": "ml-559",
+      "lang": "fr",
+      "answer": "Cet utilisateur aimerait probablement *James and the Giant Peach (1996)* car il apprécie des films qui mêlent action, aventure et fantastique, comme *Jurassic Park* et *Star Wars: Episode IV - A New Hope*. De plus, il semble attiré par des histoires originales et poétiques, similaires à celles de *The Fifth Element*, combinées à une touche d'humour, comme dans *Men in Black*."
+    }
+  ]
+}

@@ -1,0 +1,382 @@
+{
+  "variant": "awq",
+  "reference": "bf16",
+  "smoke": false,
+  "started_utc": "2026-10-26T04:21:10+00:00",
+  "judge": {
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "temperature": 0,
+    "orders": 2
+  },
+  "n": 50,
+  "overall": {
+    "win": 12,
+    "tie": 19,
+    "loss": 19
+  },
+  "by_lang": {
+    "en": {
+      "win": 8,
+      "tie": 10,
+      "loss": 7
+    },
+    "fr": {
+      "win": 4,
+      "tie": 9,
+      "loss": 12
+    }
+  },
+  "verdicts": [
+    {
+      "id": "ml-7",
+      "lang": "en",
+      "first": "tie",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-27",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-29",
+      "lang": "en",
+      "first": "A",
+      "second": "tie",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-32",
+      "lang": "fr",
+      "first": "tie",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-34",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-47",
+      "lang": "fr",
+      "first": "tie",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-49",
+      "lang": "en",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-77",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-87",
+      "lang": "en",
+      "first": "A",
+      "second": "tie",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-88",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-97",
+      "lang": "en",
+      "first": "tie",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-103",
+      "lang": "fr",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-104",
+      "lang": "en",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-108",
+      "lang": "fr",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-112",
+      "lang": "en",
+      "first": "A",
+      "second": "tie",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-113",
+      "lang": "fr",
+      "first": "A",
+      "second": "tie",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-129",
+      "lang": "en",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-151",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-171",
+      "lang": "en",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-191",
+      "lang": "fr",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-196",
+      "lang": "en",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-199",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-234",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-243",
+      "lang": "fr",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-262",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-265",
+      "lang": "fr",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-267",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-273",
+      "lang": "fr",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-279",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-286",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-302",
+      "lang": "en",
+      "first": "tie",
+      "second": "tie",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-327",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-340",
+      "lang": "en",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-344",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-358",
+      "lang": "en",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-364",
+      "lang": "fr",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-414",
+      "lang": "en",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-418",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-422",
+      "lang": "en",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-439",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-443",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-446",
+      "lang": "fr",
+      "first": "tie",
+      "second": "tie",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-452",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-461",
+      "lang": "fr",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-463",
+      "lang": "en",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-512",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    },
+    {
+      "id": "ml-515",
+      "lang": "en",
+      "first": "A",
+      "second": "B",
+      "outcome": "win"
+    },
+    {
+      "id": "ml-548",
+      "lang": "fr",
+      "first": "A",
+      "second": "A",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-553",
+      "lang": "en",
+      "first": "tie",
+      "second": "tie",
+      "outcome": "tie"
+    },
+    {
+      "id": "ml-559",
+      "lang": "fr",
+      "first": "B",
+      "second": "A",
+      "outcome": "loss"
+    }
+  ]
+}

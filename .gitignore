@@ -16,3 +16,4 @@ results/quant/*_smoke.json
 
 # downloaded source data
 data/raw/
+results/bench/*_smoke.json
