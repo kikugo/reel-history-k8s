@@ -32,7 +32,6 @@ def lm_eval_cmd(variant: str, smoke: bool, out_dir: str) -> list[str]:
     model_args = ",".join([
         f"pretrained={model_path(variant)}",
         f"max_model_len={MAX_MODEL_LEN}",
-        f"max_length={MAX_MODEL_LEN}",
         f"gpu_memory_utilization={GPU_MEMORY_UTILIZATION}",
         f"seed={config.SEED}",
     ])
