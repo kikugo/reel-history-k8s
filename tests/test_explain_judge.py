@@ -43,3 +43,12 @@ def test_judge_message_keeps_both_answers_and_the_request():
     assert "REQ" in msg and "first answer" in msg and "second answer" in msg
     assert msg.index("first answer") < msg.index("second answer")
     assert '"winner"' in msg  # braces in the JSON instruction survived str.format
+
+
+def test_retry_delay_prefers_retry_after_and_caps():
+    from bench.judge import retry_delay
+
+    assert retry_delay("7", 0) == 7.5
+    assert retry_delay("600", 0) == 60.5
+    assert retry_delay(None, 3) == 8.0
+    assert retry_delay("soon", 10) == 60.0

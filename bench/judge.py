@@ -21,7 +21,8 @@ from bench.common import RESULTS_DIR, app, load_prompts, write_result
 JUDGE_MODEL = "openai/gpt-oss-120b"
 JUDGE_URL = "https://api.groq.com/openai/v1/chat/completions"
 JUDGE_PROMPT_PATH = Path(__file__).parent / "judge_prompt.txt"
-PARALLEL = 4
+PARALLEL = 1  # Groq rate limits are per minute; one call at a time with backoff
+MAX_ATTEMPTS = 12
 
 judge_image = modal.Image.debian_slim(python_version="3.12").add_local_python_source("quant", "serve", "bench")
 
@@ -72,19 +73,29 @@ def _ask(message: str) -> str:
             "User-Agent": "reel-history-k8s-bench/0.1",  # Cloudflare rejects urllib's default agent
         },
     )
-    for attempt in range(6):
+    last = None
+    for attempt in range(MAX_ATTEMPTS):
         try:
             with urllib.request.urlopen(req, timeout=120) as resp:
                 return json.loads(resp.read())["choices"][0]["message"]["content"]
         except urllib.error.HTTPError as err:
+            last = f"HTTP {err.code}: {err.read()[:300]!r}"
             if err.code != 429 and err.code < 500:
                 # HTTPError holds a socket and can't cross the Modal boundary; keep status and body
-                raise RuntimeError(f"judge HTTP {err.code}: {err.read()[:500]!r}") from None
-            time.sleep(2 ** attempt)
-    raise RuntimeError("judge kept failing")
+                raise RuntimeError(f"judge {last}") from None
+            time.sleep(retry_delay(err.headers.get("retry-after"), attempt))
+    raise RuntimeError(f"judge kept failing after {MAX_ATTEMPTS} attempts, last {last}")
 
 
-@app.function(image=judge_image, secrets=[modal.Secret.from_name("groq")], timeout=30 * 60)
+def retry_delay(retry_after: str | None, attempt: int) -> float:
+    """Seconds to wait: Groq's Retry-After when given, else exponential backoff, capped at 60."""
+    try:
+        return min(float(retry_after), 60.0) + 0.5
+    except (TypeError, ValueError):
+        return float(min(2 ** attempt, 60))
+
+
+@app.function(image=judge_image, secrets=[modal.Secret.from_name("groq")], timeout=60 * 60)
 def judge_pairs(pairs: list[dict]) -> list[dict]:
     def one(pair):
         first = parse_verdict(_ask(pair["candidate_first"]))
