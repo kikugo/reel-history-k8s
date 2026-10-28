@@ -4,10 +4,16 @@ Judge: Groq openai/gpt-oss-120b, temperature 0. The key is in the Modal secret `
 calls run in a Modal container, so it never reaches this machine. A variant wins a prompt only
 if it wins in both orders and loses only if it loses in both; anything else is a tie.
 
-uv run modal run -m bench.judge --variant awq --smoke
-uv run modal run -m bench.judge --variant awq
+uv run modal run -m bench.judge::run_judge --variant awq --smoke
+uv run modal run --detach -m bench.judge::run_judge --variant gptq
+uv run modal run -m bench.judge::fetch_judge --variant gptq   # if the local client disconnected
+
+Each verdict is cached on the c2-models Volume as soon as it arrives, and the finished record
+is written there too. A run cut off by a sleeping laptop keeps going with --detach, and a
+rerun only asks Groq about pairs it hasn't judged yet.
 """
 
+import hashlib
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -16,13 +22,15 @@ from pathlib import Path
 
 import modal
 
-from bench.common import RESULTS_DIR, app, load_prompts, write_result
+from bench.common import RESULTS_DIR, VOLUMES, app, load_prompts, models, write_result
+from quant import config
 
 JUDGE_MODEL = "openai/gpt-oss-120b"
 JUDGE_URL = "https://api.groq.com/openai/v1/chat/completions"
 JUDGE_PROMPT_PATH = Path(__file__).parent / "judge_prompt.txt"
 PARALLEL = 1  # Groq rate limits are per minute; one call at a time with backoff
 MAX_ATTEMPTS = 12
+JUDGE_DIR = f"{config.VOL_MOUNT}/judge"
 
 judge_image = modal.Image.debian_slim(python_version="3.12").add_local_python_source("quant", "serve", "bench")
 
@@ -52,6 +60,27 @@ def combine(first: str, second: str) -> str:
 
 def tally(outcomes: list[str]) -> dict:
     return {k: outcomes.count(k) for k in ("win", "tie", "loss")}
+
+
+def pair_key(pair: dict) -> str:
+    """Cache key: changes whenever either judge message changes, so stale verdicts are never reused."""
+    digest = hashlib.sha256((pair["candidate_first"] + "\0" + pair["reference_first"]).encode())
+    return f"{pair['id']}-{digest.hexdigest()[:16]}"
+
+
+def build_record(variant: str, smoke: bool, started: str, verdicts: list[dict]) -> dict:
+    return {
+        "variant": variant, "reference": "bf16", "smoke": smoke, "started_utc": started,
+        "judge": {"provider": "groq", "model": JUDGE_MODEL, "temperature": 0, "orders": 2},
+        "n": len(verdicts),
+        "overall": tally([v["outcome"] for v in verdicts]),
+        "by_lang": {lang: tally([v["outcome"] for v in verdicts if v["lang"] == lang]) for lang in ("en", "fr")},
+        "verdicts": verdicts,
+    }
+
+
+def _run_name(variant: str, smoke: bool) -> str:
+    return f"judge_{variant}_smoke" if smoke else f"judge_{variant}"
 
 
 def _ask(message: str) -> str:
@@ -95,16 +124,35 @@ def retry_delay(retry_after: str | None, attempt: int) -> float:
         return float(min(2 ** attempt, 60))
 
 
-@app.function(image=judge_image, secrets=[modal.Secret.from_name("groq")], timeout=60 * 60)
-def judge_pairs(pairs: list[dict]) -> list[dict]:
+@app.function(image=judge_image, secrets=[modal.Secret.from_name("groq")], volumes=VOLUMES, timeout=3 * 60 * 60)
+def judge_variant(variant: str, smoke: bool, started: str, pairs: list[dict]) -> dict:
+    cache = Path(JUDGE_DIR, _run_name(variant, smoke))
+    cache.mkdir(parents=True, exist_ok=True)
+
     def one(pair):
+        path = cache / f"{pair_key(pair)}.json"
+        if path.exists():
+            return json.loads(path.read_text())
         first = parse_verdict(_ask(pair["candidate_first"]))
         second = parse_verdict(_ask(pair["reference_first"]))
-        return {"id": pair["id"], "lang": pair["lang"], "first": first, "second": second,
-                "outcome": combine(first, second)}
+        verdict = {"id": pair["id"], "lang": pair["lang"], "first": first, "second": second,
+                   "outcome": combine(first, second)}
+        path.write_text(json.dumps(verdict))
+        models.commit()
+        return verdict
 
     with ThreadPoolExecutor(PARALLEL) as pool:
-        return list(pool.map(one, pairs))
+        verdicts = list(pool.map(one, pairs))
+    record = build_record(variant, smoke, started, verdicts)
+    Path(JUDGE_DIR, f"{_run_name(variant, smoke)}.json").write_text(json.dumps(record, indent=2, ensure_ascii=False))
+    models.commit()
+    return record
+
+
+@app.function(image=judge_image, volumes=VOLUMES, timeout=5 * 60)
+def read_record(variant: str, smoke: bool) -> dict | None:
+    path = Path(JUDGE_DIR, f"{_run_name(variant, smoke)}.json")
+    return json.loads(path.read_text()) if path.exists() else None
 
 
 def _answers(variant: str, smoke: bool) -> dict:
@@ -112,25 +160,28 @@ def _answers(variant: str, smoke: bool) -> dict:
     return {i["id"]: i["answer"] for i in json.loads((RESULTS_DIR / name).read_text())["items"]}
 
 
-@app.local_entrypoint()
-def run_judge(variant: str, smoke: bool = False):
-    if variant == "bf16":
-        raise ValueError("bf16 is the reference; judge awq, gptq or gguf")
+def build_pairs(variant: str, smoke: bool) -> list[dict]:
     reference, candidate = _answers("bf16", smoke), _answers(variant, smoke)
     prompts = [p for p in load_prompts() if p["id"] in candidate]
-    pairs = [{
+    return [{
         "id": p["id"], "lang": p["lang"],
         "candidate_first": judge_message(p["prompt"], candidate[p["id"]], reference[p["id"]]),
         "reference_first": judge_message(p["prompt"], reference[p["id"]], candidate[p["id"]]),
     } for p in prompts]
+
+
+@app.local_entrypoint()
+def run_judge(variant: str, smoke: bool = False):
+    if variant == "bf16":
+        raise ValueError("bf16 is the reference; judge awq, gptq or gguf")
     started = datetime.now(UTC).isoformat(timespec="seconds")
-    verdicts = judge_pairs.remote(pairs)
-    record = {
-        "variant": variant, "reference": "bf16", "smoke": smoke, "started_utc": started,
-        "judge": {"provider": "groq", "model": JUDGE_MODEL, "temperature": 0, "orders": 2},
-        "n": len(verdicts),
-        "overall": tally([v["outcome"] for v in verdicts]),
-        "by_lang": {lang: tally([v["outcome"] for v in verdicts if v["lang"] == lang]) for lang in ("en", "fr")},
-        "verdicts": verdicts,
-    }
+    record = judge_variant.remote(variant, smoke, started, build_pairs(variant, smoke))
+    write_result(f"judge_{variant}", record, smoke)
+
+
+@app.local_entrypoint()
+def fetch_judge(variant: str, smoke: bool = False):
+    record = read_record.remote(variant, smoke)
+    if record is None:
+        raise SystemExit(f"no finished {_run_name(variant, smoke)} record on the Volume yet")
     write_result(f"judge_{variant}", record, smoke)

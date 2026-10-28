@@ -52,3 +52,23 @@ def test_retry_delay_prefers_retry_after_and_caps():
     assert retry_delay("600", 0) == 60.5
     assert retry_delay(None, 3) == 8.0
     assert retry_delay("soon", 10) == 60.0
+
+
+def test_pair_key_changes_with_the_messages():
+    from bench.judge import pair_key
+
+    a = {"id": "ml-1", "candidate_first": "x", "reference_first": "y"}
+    assert pair_key(a) == pair_key(dict(a))
+    assert pair_key(a) != pair_key({**a, "candidate_first": "x2"})
+    assert pair_key(a).startswith("ml-1-")
+
+
+def test_build_record_tallies_by_language():
+    from bench.judge import build_record
+
+    verdicts = [{"lang": "en", "outcome": "win"}, {"lang": "fr", "outcome": "loss"},
+                {"lang": "fr", "outcome": "tie"}]
+    rec = build_record("gptq", False, "t", verdicts)
+    assert rec["n"] == 3
+    assert rec["overall"] == {"win": 1, "tie": 1, "loss": 1}
+    assert rec["by_lang"]["fr"] == {"win": 0, "tie": 1, "loss": 1}
