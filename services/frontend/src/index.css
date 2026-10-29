@@ -1,0 +1,49 @@
+:root {
+  --bg: #f7f4ee;
+  --fg: #1d1b18;
+  --muted: #6d675e;
+  --line: #ddd6c8;
+  --accent: #9c3d1f;
+  --card: #fffdf8;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17150f;
+    --fg: #ece6da;
+    --muted: #a39b8c;
+    --line: #38332a;
+    --accent: #e07a52;
+    --card: #1f1c15;
+  }
+}
+
+body { margin: 0; background: var(--bg); }
+main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+h1 { margin: 0; font-size: 2rem; letter-spacing: -0.01em; }
+.muted { color: var(--muted); font-size: 0.9rem; }
+button, input, select { font: inherit; color: inherit; }
+button { background: none; border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; margin: 12px 0 24px; }
+select, input { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.search { position: relative; }
+.search input { width: 100%; box-sizing: border-box; }
+.hits { position: absolute; z-index: 1; left: 0; right: 0; margin: 4px 0 0; padding: 4px; list-style: none;
+  background: var(--card); border: 1px solid var(--line); border-radius: 6px; }
+.hits button { border: 0; width: 100%; text-align: left; }
+.liked { padding-left: 20px; }
+.liked li { margin: 4px 0; }
+.liked button { border: 0; padding: 0 8px; color: var(--muted); }
+.cards { list-style: none; padding: 0; display: grid; gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.card .title { font-size: 1.1rem; }
+.actions { display: flex; gap: 8px; margin-top: 10px; }
+.why { line-height: 1.5; }
+.badge { font-size: 0.75rem; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; color: var(--muted); }
+.badge.llm, .badge.cache { color: var(--accent); border-color: var(--accent); }
+.error { color: var(--accent); }
