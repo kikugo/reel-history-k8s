@@ -31,6 +31,7 @@ JUDGE_PROMPT_PATH = Path(__file__).parent / "judge_prompt.txt"
 PARALLEL = 1  # Groq rate limits are per minute; one call at a time with backoff
 MAX_ATTEMPTS = 12
 JUDGE_DIR = f"{config.VOL_MOUNT}/judge"
+POLL_S = 30
 
 judge_image = modal.Image.debian_slim(python_version="3.12").add_local_python_source("quant", "serve", "bench")
 
@@ -175,7 +176,16 @@ def run_judge(variant: str, smoke: bool = False):
     if variant == "bf16":
         raise ValueError("bf16 is the reference; judge awq, gptq or gguf")
     started = datetime.now(UTC).isoformat(timespec="seconds")
-    record = judge_variant.remote(variant, smoke, started, build_pairs(variant, smoke))
+    # spawn + short polls: with --detach the spawned call keeps running on Modal even if this
+    # client drops, and no single long-held stream is open for a flaky connection to cut.
+    call = judge_variant.spawn(variant, smoke, started, build_pairs(variant, smoke))
+    print(f"spawned {call.object_id}; if this client drops, use fetch_judge once it finishes")
+    while True:
+        try:
+            record = call.get(timeout=POLL_S)
+            break
+        except (TimeoutError, modal.exception.TimeoutError):
+            continue
     write_result(f"judge_{variant}", record, smoke)
 
 
