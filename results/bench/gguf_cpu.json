@@ -1,0 +1,21 @@
+{
+  "smoke": false,
+  "started_utc": "2026-10-26T05:22:06+00:00",
+  "variant": "gguf",
+  "quant_type": "Q4_K_M",
+  "llama_cpp_tag": "v0.7.0",
+  "cpu_cores": 8,
+  "cpu_info": "unknown",
+  "prompt": {
+    "tokens": 512,
+    "avg_tokens_per_s": 77.207184,
+    "stddev_tokens_per_s": 1.068223
+  },
+  "generation": {
+    "tokens": 256,
+    "avg_tokens_per_s": 18.54627,
+    "stddev_tokens_per_s": 0.497042
+  },
+  "wall_clock_s": 71.2,
+  "cost_usd": 0.01
+}
