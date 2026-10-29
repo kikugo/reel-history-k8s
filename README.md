@@ -64,7 +64,8 @@ Word perplexity (lower is better) with lm-evaluation-harness. Judge: openai/gpt-
 |---|---|---|---|
 | BF16 | 12.74 | 38.23 | reference |
 | AWQ W4A16 | 13.09 | 39.31 | 12 / 19 / 19 |
-| GPTQ W4A16 | 13.36 | 44.01 | n/a |
+| GPTQ W4A16 | 13.36 | 44.01 | 7 / 22 / 21 |
+| GGUF Q4_K_M | n/a | n/a | 5 / 25 / 20 |
 
 ### Cost
 
