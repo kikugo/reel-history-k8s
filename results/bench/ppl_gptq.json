@@ -1,0 +1,33 @@
+{
+  "variant": "gptq",
+  "smoke": false,
+  "started_utc": "2026-10-26T03:30:36+00:00",
+  "wikitext2": {
+    "word_perplexity": 13.363554030471288,
+    "byte_perplexity": 1.6238766509036506,
+    "bits_per_byte": 0.6994420500796565
+  },
+  "frwiki": {
+    "word_perplexity": 44.00881490166981,
+    "byte_perplexity": 1.7693683476846356,
+    "bits_per_byte": 0.8232344200233979
+  },
+  "frwiki_slice": {
+    "repo": "wikimedia/wikipedia",
+    "revision": "b04c8d1ceb2f5cd4588862100d08de323dccfbaa",
+    "shard": "20231101.fr/train-00000-of-00017.parquet",
+    "articles": 100,
+    "min_chars": 2000
+  },
+  "limit": null,
+  "gpu": "L4",
+  "gpu_name": "NVIDIA L4",
+  "wall_clock_s": 710.0,
+  "cost_usd": 0.2453,
+  "versions": {
+    "lm-eval": "0.4.13",
+    "vllm": "0.32.0",
+    "torch": "2.13.0",
+    "transformers": "5.17.0"
+  }
+}

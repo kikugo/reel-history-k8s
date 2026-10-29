@@ -1,0 +1,33 @@
+{
+  "variant": "bf16",
+  "smoke": false,
+  "started_utc": "2026-10-26T03:08:29+00:00",
+  "wikitext2": {
+    "word_perplexity": 12.742301390533807,
+    "byte_perplexity": 1.6094847909467256,
+    "bits_per_byte": 0.6865989439299698
+  },
+  "frwiki": {
+    "word_perplexity": 38.22549163323229,
+    "byte_perplexity": 1.7321772898612344,
+    "bits_per_byte": 0.7925865987215365
+  },
+  "frwiki_slice": {
+    "repo": "wikimedia/wikipedia",
+    "revision": "b04c8d1ceb2f5cd4588862100d08de323dccfbaa",
+    "shard": "20231101.fr/train-00000-of-00017.parquet",
+    "articles": 100,
+    "min_chars": 2000
+  },
+  "limit": null,
+  "gpu": "L4",
+  "gpu_name": "NVIDIA L4",
+  "wall_clock_s": 667.7,
+  "cost_usd": 0.2306,
+  "versions": {
+    "lm-eval": "0.4.13",
+    "vllm": "0.32.0",
+    "torch": "2.13.0",
+    "transformers": "5.17.0"
+  }
+}
