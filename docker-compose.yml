@@ -1,0 +1,67 @@
+# Local run of the three services: docker compose up --build, then open http://localhost:8080
+# The explainer uses the template fallback unless VLLM_BASE_URL and VLLM_API_KEY are set in .env.
+name: reel-history
+
+x-probe: &probe
+  interval: 5s
+  timeout: 3s
+  retries: 12
+  start_period: 10s
+
+services:
+  # one-shot download of the model artifacts into a shared volume (an init container on Kubernetes)
+  recommender-init:
+    build: ./services/recommender
+    image: reel-history/recommender:dev
+    command: ["python", "-m", "recommender.fetch"]
+    environment:
+      HF_REVISION: ${HF_REVISION:-c0509d93deee3296f88cca0c0e10c6789bc2683c}
+    volumes:
+      - artifacts:/artifacts
+
+  recommender:
+    build: ./services/recommender
+    image: reel-history/recommender:dev
+    depends_on:
+      recommender-init:
+        condition: service_completed_successfully
+    volumes:
+      - artifacts:/artifacts:ro
+    ports:
+      - "8001:8000"
+    healthcheck:
+      <<: *probe
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=2)"]
+
+  explainer:
+    build: ./services/explainer
+    image: reel-history/explainer:dev
+    environment:
+      VLLM_BASE_URL: ${VLLM_BASE_URL:-}
+      VLLM_API_KEY: ${VLLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-qwen3-8b-awq}
+    ports:
+      - "8002:8000"
+    healthcheck:
+      <<: *probe
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=2)"]
+
+  frontend:
+    build: ./services/frontend
+    image: reel-history/frontend:dev
+    environment:
+      RECOMMENDER_URL: http://recommender:8000
+      EXPLAINER_URL: http://explainer:8000
+    depends_on:
+      recommender:
+        condition: service_healthy
+      explainer:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      <<: *probe
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/readyz"]
+
+volumes:
+  artifacts:

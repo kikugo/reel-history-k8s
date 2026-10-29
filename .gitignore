@@ -5,6 +5,7 @@ __pycache__/
 .ruff_cache/
 .env
 .env.*
+!.env.example
 .claude/settings.local.json
 # model weights never go in git; they live on the Modal Volume and Hugging Face
 *.safetensors

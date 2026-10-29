@@ -11,11 +11,26 @@ dev = [
     "matplotlib>=3.11.2",
     "pytest>=9.1.1",
     "ruff>=0.17.2",
+    # the Phase 4 services' runtime deps (light CPU wheels), so one `uv run pytest` covers them
+    "fastapi>=0.120",
+    "httpx>=0.28",
+    "numpy>=2.2",
+    "pandas>=2.3",
+    "onnxruntime>=1.23",
+    "onnx>=1.19",
+    "faiss-cpu>=1.12",
+    "huggingface_hub>=1.0",
+    "prometheus-fastapi-instrumentator>=7.1",
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["."]
-testpaths = ["tests"]
+pythonpath = [".", "services/recommender", "services/explainer"]
+testpaths = ["tests", "services/recommender/tests", "services/explainer/tests"]
+# each service has its own tests/conftest.py; importlib mode keeps them from colliding
+addopts = ["--import-mode=importlib"]
 
 [tool.ruff]
 line-length = 110
+
+[tool.ruff.lint.isort]
+known-first-party = ["quant", "serve", "bench", "recommender", "explainer"]

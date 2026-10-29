@@ -1,0 +1,24 @@
+# Rendered by the nginx image's entrypoint (envsubst on /etc/nginx/templates/*.template),
+# so the same image points at compose hostnames locally and Service names on Kubernetes.
+server {
+    listen 8080;
+    root /usr/share/nginx/html;
+
+    location = /healthz { access_log off; default_type application/json; return 200 '{"status":"ok"}'; }
+    location = /readyz  { access_log off; default_type application/json; return 200 '{"status":"ready"}'; }
+    # request and connection counters until Phase 6 adds an exporter
+    location = /nginx_status { stub_status; access_log off; }
+
+    location /api/rec/ {
+        proxy_pass ${RECOMMENDER_URL}/;
+        proxy_set_header Host $host;
+    }
+    location /api/explain/ {
+        proxy_pass ${EXPLAINER_URL}/;
+        proxy_set_header Host $host;
+        proxy_read_timeout 60s;  # the explainer itself gives up on the LLM after 30 s
+    }
+
+    location /assets/ { expires 7d; add_header Cache-Control "public, immutable"; }
+    location / { try_files $uri /index.html; }
+}
