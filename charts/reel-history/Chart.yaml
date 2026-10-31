@@ -1,0 +1,7 @@
+apiVersion: v2
+name: reel-history
+description: Reel History recommender, explainer and frontend behind an Envoy Gateway
+type: application
+version: 0.5.0
+appVersion: "0.5.0"
+kubeVersion: ">=1.33.0-0"  # preStop sleep action
