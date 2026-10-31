@@ -1,0 +1,49 @@
+{
+  "started_utc": "2026-10-31T07:03:30+00:00",
+  "kubernetes": "v1.37.0",
+  "ready": {
+    "passed": true,
+    "statuses": {
+      "/": 200,
+      "/api/rec/readyz": 200,
+      "/api/explain/readyz": 200
+    },
+    "pods": [
+      "explainer-55d69d4c78-g7dn8",
+      "explainer-55d69d4c78-pnqsq",
+      "frontend-76d6d4895c-vwkfz",
+      "frontend-76d6d4895c-xf2gn",
+      "recommender-5fb6c78bbf-p5ccg",
+      "recommender-5fb6c78bbf-xg9lk"
+    ]
+  },
+  "self_healing": {
+    "passed": true,
+    "deleted": "recommender-5fb6c78bbf-p5ccg",
+    "pods_before": [
+      "recommender-5fb6c78bbf-p5ccg",
+      "recommender-5fb6c78bbf-xg9lk"
+    ],
+    "pods_after": [
+      "recommender-5fb6c78bbf-db2cl",
+      "recommender-5fb6c78bbf-xg9lk"
+    ],
+    "seconds_to_full": 10.4
+  },
+  "rollout": {
+    "passed": true,
+    "tag": "73e00da-1793430210",
+    "images": {
+      "recommender": "reel-history/recommender:73e00da-1793430210",
+      "explainer": "reel-history/explainer:73e00da-1793430210",
+      "frontend": "reel-history/frontend:73e00da-1793430210"
+    },
+    "requests": 64372,
+    "failed": 0,
+    "failures": [],
+    "load_seconds": 35.6,
+    "load_threads": 4
+  },
+  "passed": true,
+  "finished_utc": "2026-10-31T07:04:24+00:00"
+}
