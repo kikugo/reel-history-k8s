@@ -1,0 +1,147 @@
+# Recommender: GRU4Rec (onnxruntime) + LLaRA FAISS index. Stateless, so it scales sideways.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recommender
+  namespace: reel-history
+  labels:
+    app.kubernetes.io/name: recommender
+    app.kubernetes.io/part-of: reel-history
+data:
+  HF_REPO: karthikcr/reel-history
+  HF_REPO_TYPE: space
+  HF_REVISION: c0509d93deee3296f88cca0c0e10c6789bc2683c
+  ARTIFACT_DIR: /artifacts
+  HF_HOME: /tmp/hf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommender
+  namespace: reel-history
+  labels:
+    app.kubernetes.io/name: recommender
+    app.kubernetes.io/part-of: reel-history
+spec:
+  replicas: 2  # the HPA owns this once it exists; it's the starting point
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: recommender
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0  # never drop below the current Ready count during a rollout
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: recommender
+        app.kubernetes.io/part-of: reel-history
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
+      # Downloads the pinned artifacts before the API starts; the pod isn't scheduled as
+      # Running until this exits 0.
+      initContainers:
+        - name: fetch-artifacts
+          image: reel-history/recommender:dev
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "recommender.fetch"]
+          envFrom:
+            - configMapRef:
+                name: recommender
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          securityContext: &restricted
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - {name: artifacts, mountPath: /artifacts}
+            - {name: tmp, mountPath: /tmp}
+      containers:
+        - name: recommender
+          image: reel-history/recommender:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - {name: http, containerPort: 8000}
+          envFrom:
+            - configMapRef:
+                name: recommender
+          resources:
+            requests: {cpu: 250m, memory: 384Mi}  # ~290 MiB measured after load
+            limits: {cpu: "1", memory: 768Mi}
+          securityContext: *restricted
+          # Loading the catalog and model takes a few seconds; until the first success the
+          # liveness probe is held off, so a slow start isn't killed as a hang.
+          startupProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 2
+            failureThreshold: 30
+          # Ready only once the model has loaded and run one inference (see /readyz).
+          readinessProbe:
+            httpGet: {path: /readyz, port: http}
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+            failureThreshold: 3
+          lifecycle:
+            # keep serving while the endpoint removal reaches Envoy, then take SIGTERM
+            preStop:
+              sleep: {seconds: 5}
+          volumeMounts:
+            - {name: artifacts, mountPath: /artifacts, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: artifacts
+          emptyDir: {sizeLimit: 256Mi}
+        - name: tmp
+          emptyDir: {sizeLimit: 64Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommender
+  namespace: reel-history
+  labels:
+    app.kubernetes.io/name: recommender
+    app.kubernetes.io/part-of: reel-history
+spec:
+  selector:
+    app.kubernetes.io/name: recommender
+  ports:
+    - {name: http, port: 8000, targetPort: http}
+---
+# Scales on average CPU across pods, as a share of the 250m request.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: recommender
+  namespace: reel-history
+  labels:
+    app.kubernetes.io/name: recommender
+    app.kubernetes.io/part-of: reel-history
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: recommender
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
