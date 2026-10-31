@@ -1,0 +1,14 @@
+# AKS (Phase 8): images from ACR, Envoy behind an Azure load balancer.
+image:
+  # image.repository is set in Phase 8 to the ACR login server Terraform outputs.
+  repository: "REPLACE_WITH_ACR.azurecr.io/reel-history"
+  pullPolicy: "IfNotPresent"
+
+gateway:
+  serviceType: "LoadBalancer"
+
+services:
+  recommender:
+    hpa:
+      minReplicas: 2
+      maxReplicas: 4  # one small node pool

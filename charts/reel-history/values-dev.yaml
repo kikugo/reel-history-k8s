@@ -1,0 +1,9 @@
+# kind: images loaded into the node with `make images`, Envoy on NodePort 30080
+# (kind/cluster.yaml maps it to http://localhost:8080).
+image:
+  repository: "reel-history"
+  pullPolicy: "IfNotPresent"
+
+gateway:
+  serviceType: "NodePort"
+  nodePort: 30080
