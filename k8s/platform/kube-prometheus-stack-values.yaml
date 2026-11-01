@@ -1,0 +1,42 @@
+# kube-prometheus-stack on a laptop kind cluster (make monitoring).
+alertmanager:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    # pick up ServiceMonitors/PodMonitors from any release, not only this chart's own
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    scrapeInterval: 15s
+    retention: 1d
+    resources:
+      requests: {cpu: 200m, memory: 512Mi}
+      limits: {memory: 1Gi}
+
+grafana:
+  # the dashboard sidecar loads ConfigMaps labelled grafana_dashboard: "1" (chart default)
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+  resources:
+    requests: {cpu: 50m, memory: 256Mi}
+    limits: {memory: 512Mi}
+  # the first start runs database migrations for minutes on a laptop; the chart's 60 s
+  # liveness delay kills it mid-migration
+  livenessProbe:
+    httpGet: {path: /api/health, port: 3000}
+    initialDelaySeconds: 300
+    timeoutSeconds: 30
+    failureThreshold: 10
+
+# kind runs etcd, the scheduler and the controller manager bound to localhost, so these
+# scrapes fail there; they add nothing to this project's dashboard.
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
