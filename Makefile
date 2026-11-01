@@ -1,7 +1,8 @@
-# Local Kubernetes for Reel History (Phase 5). Needs Docker, kind, kubectl and helm.
+# Local Kubernetes for Reel History (Phases 5-6). Needs Docker, kind, kubectl and helm.
 #   make kind-up platform images secrets k8s-apply   # plain manifests
 #   make k8s-delete helm-install                      # same app from the Helm chart
 #   make check                                        # the Phase 5 done-when checks
+#   make monitoring grafana                           # Prometheus + Grafana (Phase 6)
 
 CLUSTER        ?= reel-history
 NAMESPACE      ?= reel-history
@@ -10,9 +11,10 @@ CHART          := charts/reel-history
 SERVICES       := recommender explainer frontend
 ENVOY_GATEWAY  := v1.9.3
 METRICS_SERVER := 3.14.0
+KPS            := 92.17.0
 
 .PHONY: kind-up kind-down platform images secrets k8s-validate k8s-apply k8s-delete \
-        helm-lint helm-template helm-install check
+        helm-lint helm-template helm-install check monitoring grafana prometheus
 
 kind-up:
 	kind get clusters | grep -qx $(CLUSTER) || kind create cluster --config kind/cluster.yaml
@@ -73,3 +75,17 @@ helm-install:
 
 check:
 	uv run python scripts/kind_check.py
+
+monitoring:
+	helm upgrade --install kps kube-prometheus-stack --repo https://prometheus-community.github.io/helm-charts \
+		--version $(KPS) -n monitoring --create-namespace -f k8s/platform/kube-prometheus-stack-values.yaml \
+		--wait --timeout 10m
+
+# Grafana on http://localhost:3000 (user admin; password: kubectl -n monitoring get secret kps-grafana
+# -o jsonpath='{.data.admin-password}' | base64 -d)
+grafana:
+	kubectl -n monitoring port-forward svc/kps-grafana 3000:80
+
+# Prometheus on http://localhost:19090 (9090 is often taken by other local stacks)
+prometheus:
+	kubectl -n monitoring port-forward svc/kps-kube-prometheus-stack-prometheus 19090:9090
