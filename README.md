@@ -162,3 +162,20 @@ scripts/compose_smoke.sh        # health, non-root, recommend, similar, explain 
 ```
 
 The GRU4Rec and LLaRA models were trained in the Reel History team project at EPITA with my teammates Ganesh and Ana Maria. The service code in this repo is new.
+
+### Part 2: on Kubernetes with kind and Helm (Phase 5)
+
+The three services run on a local [kind](https://kind.sigs.k8s.io/) cluster behind [Envoy Gateway](https://gateway.envoyproxy.io/) (Gateway API), with metrics-server feeding a CPU autoscaler on the recommender. The community ingress-nginx controller was retired in March 2026, so routing uses Gateway API objects: one `Gateway` and one `HTTPRoute` that sends `/api/rec/` and `/api/explain/` straight to their services and everything else to the frontend.
+
+- `k8s/`: plain manifests, one file per service (ConfigMap, Deployment, Service, plus the recommender's HPA), the Gateway objects, and the cluster-wide platform pieces. Every pod runs as non-root on a read-only root filesystem, with readiness, liveness and resource limits. The recommender downloads its model in an init container and only reports ready after one inference.
+- `charts/reel-history`: the same objects as a Helm chart, with `values-dev.yaml` for kind and `values-aks.yaml` for AKS.
+
+```bash
+make kind-up platform images secrets      # cluster, metrics-server, Envoy Gateway, images
+make helm-install                         # or `make k8s-apply` for the plain manifests
+make check                                # all Ready, a deleted pod comes back, zero-failure rollout
+make helm-lint helm-template              # chart checks
+make kind-down
+```
+
+`make check` writes its record to `results/k8s/kind_check.json`.

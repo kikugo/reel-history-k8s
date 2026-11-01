@@ -1,0 +1,129 @@
+{{- /* One ConfigMap, Deployment and Service per entry in .Values.services. */ -}}
+{{- range $name, $svc := .Values.services }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "rh.labels" (list $ $name) | nindent 4 }}
+data:
+  {{- range $k, $v := $svc.config }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "rh.labels" (list $ $name) | nindent 4 }}
+spec:
+  {{- if not $svc.hpa.enabled }}
+  replicas: {{ $svc.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "rh.selector" (list $ $name) | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        {{- include "rh.labels" (list $ $name) | nindent 8 }}
+      annotations:
+        # a config change changes this hash, which rolls the pods
+        checksum/config: {{ $svc.config | toYaml | sha256sum }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ $svc.runAsUser }}
+        runAsGroup: {{ $svc.runAsUser }}
+        fsGroup: {{ $svc.runAsUser }}
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: {{ $svc.terminationGracePeriodSeconds }}
+      {{- if $svc.fetchArtifacts.enabled }}
+      initContainers:
+        - name: fetch-artifacts
+          image: {{ include "rh.image" (list $ $name) }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          command: ["python", "-m", "recommender.fetch"]
+          envFrom:
+            - configMapRef:
+                name: {{ $name }}
+          resources:
+            {{- toYaml $svc.fetchArtifacts.resources | nindent 12 }}
+          securityContext:
+            {{- include "rh.containerSecurity" . | nindent 12 }}
+          volumeMounts:
+            - {name: artifacts, mountPath: {{ $svc.config.ARTIFACT_DIR }}}
+            - {name: tmp, mountPath: /tmp}
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          image: {{ include "rh.image" (list $ $name) }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - {name: http, containerPort: {{ $svc.port }}}
+          envFrom:
+            - configMapRef:
+                name: {{ $name }}
+            {{- if $svc.secretName }}
+            - secretRef:
+                name: {{ $svc.secretName }}
+                optional: true
+            {{- end }}
+          resources:
+            {{- toYaml $svc.resources | nindent 12 }}
+          securityContext:
+            {{- include "rh.containerSecurity" . | nindent 12 }}
+          {{- if $svc.probes.startup }}
+          startupProbe:
+            httpGet: {path: {{ $svc.probes.liveness }}, port: http}
+            periodSeconds: 2
+            failureThreshold: 30
+          {{- end }}
+          readinessProbe:
+            httpGet: {path: {{ $svc.probes.readiness }}, port: http}
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet: {path: {{ $svc.probes.liveness }}, port: http}
+            periodSeconds: 10
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              sleep: {seconds: {{ $.Values.preStopSleepSeconds }}}
+          volumeMounts:
+            {{- if $svc.fetchArtifacts.enabled }}
+            - {name: artifacts, mountPath: {{ $svc.config.ARTIFACT_DIR }}, readOnly: true}
+            {{- end }}
+            {{- range $svc.scratch }}
+            - {name: {{ .name }}, mountPath: {{ .mountPath }}}
+            {{- end }}
+      volumes:
+        {{- if $svc.fetchArtifacts.enabled }}
+        - name: artifacts
+          emptyDir: {sizeLimit: {{ $svc.fetchArtifacts.sizeLimit }}}
+        {{- end }}
+        {{- range $svc.scratch }}
+        - name: {{ .name }}
+          emptyDir: {sizeLimit: {{ .sizeLimit }}}
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "rh.labels" (list $ $name) | nindent 4 }}
+spec:
+  selector:
+    {{- include "rh.selector" (list $ $name) | nindent 4 }}
+  ports:
+    - {name: http, port: {{ $svc.port }}, targetPort: http}
+---
+{{- end }}

@@ -1,0 +1,79 @@
+# Traffic in: Gateway API objects, implemented by Envoy Gateway (GatewayClass "eg").
+#
+# EnvoyProxy: how Envoy Gateway runs the Envoy pods for this Gateway. On kind there's no
+# cloud load balancer, so the Envoy Service is a NodePort pinned to 30080, which
+# kind/cluster.yaml maps to localhost:8080.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: reel-history-proxy
+  namespace: reel-history
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: NodePort
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              ports:
+                - port: 80
+                  nodePort: 30080
+---
+# Gateway: one HTTP listener on port 80 (Envoy maps it to an unprivileged port inside).
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: reel-history
+  namespace: reel-history
+spec:
+  gatewayClassName: eg
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: reel-history-proxy
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+# HTTPRoute: /api/rec/* and /api/explain/* go straight to their services with the prefix
+# stripped; everything else goes to the frontend. The longest matching prefix wins.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: reel-history
+  namespace: reel-history
+spec:
+  parentRefs:
+    - name: reel-history
+      sectionName: http
+  rules:
+    - matches:
+        - path: {type: PathPrefix, value: /api/rec/}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path: {type: ReplacePrefixMatch, replacePrefixMatch: /}
+      backendRefs:
+        - {name: recommender, port: 8000}
+    - matches:
+        - path: {type: PathPrefix, value: /api/explain/}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path: {type: ReplacePrefixMatch, replacePrefixMatch: /}
+      timeouts:
+        request: 60s  # the explainer gives up on the LLM after 30 s
+      backendRefs:
+        - {name: explainer, port: 8000}
+    - matches:
+        - path: {type: PathPrefix, value: /}
+      backendRefs:
+        - {name: frontend, port: 8080}

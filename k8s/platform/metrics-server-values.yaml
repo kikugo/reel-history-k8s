@@ -1,0 +1,5 @@
+# kind's kubelet serving certificates aren't signed by the cluster CA, so metrics-server
+# can't verify them. The metrics-server README marks this flag as testing-only; kind is a
+# local test cluster. AKS doesn't need it.
+args:
+  - --kubelet-insecure-tls

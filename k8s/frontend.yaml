@@ -1,0 +1,94 @@
+# Frontend: the React build on unprivileged nginx (uid 101, port 8080).
+# The Gateway sends /api/* straight to the services; nginx's own proxy is only used by
+# docker compose, but its upstream URLs still have to resolve for nginx to start.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend
+  namespace: reel-history
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: reel-history
+data:
+  RECOMMENDER_URL: http://recommender:8000
+  EXPLAINER_URL: http://explainer:8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: reel-history
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: reel-history
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: frontend
+        app.kubernetes.io/part-of: reel-history
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          image: reel-history/frontend:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - {name: http, containerPort: 8080}
+          envFrom:
+            - configMapRef:
+                name: frontend
+          resources:
+            requests: {cpu: 25m, memory: 32Mi}  # ~22 MiB measured
+            limits: {cpu: 250m, memory: 128Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet: {path: /readyz, port: http}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          lifecycle:
+            preStop:
+              sleep: {seconds: 5}
+          # with a read-only root, nginx writes its rendered config and temp files here
+          volumeMounts:
+            - {name: conf, mountPath: /etc/nginx/conf.d}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: conf
+          emptyDir: {sizeLimit: 1Mi}
+        - name: tmp
+          emptyDir: {sizeLimit: 64Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: reel-history
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: reel-history
+spec:
+  selector:
+    app.kubernetes.io/name: frontend
+  ports:
+    - {name: http, port: 8080, targetPort: http}

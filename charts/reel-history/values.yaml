@@ -1,0 +1,117 @@
+# Defaults for the Reel History chart. values-dev.yaml (kind) and values-aks.yaml (AKS)
+# override what differs. The plain manifests in k8s/ are the readable version of this.
+
+# image.repository is the prefix of every image: <repository>/<service>:<tag>.
+image:
+  repository: "reel-history"
+  # image.tag is shared by the three services; `helm upgrade --set image.tag=<sha>` rolls all.
+  tag: "dev"
+  # image.pullPolicy is IfNotPresent so kind can use images loaded with `kind load`.
+  pullPolicy: "IfNotPresent"
+
+# preStopSleepSeconds keeps a terminating pod serving while Envoy drops its endpoint.
+preStopSleepSeconds: 5
+
+# services holds one entry per Deployment + Service, keyed by name.
+services:
+  recommender:
+    # services.recommender.replicas is ignored when the HPA is enabled.
+    replicas: 2
+    port: 8000
+    runAsUser: 10001
+    # services.recommender.config becomes the ConfigMap, loaded with envFrom.
+    config:
+      HF_REPO: "karthikcr/reel-history"
+      HF_REPO_TYPE: "space"
+      HF_REVISION: "c0509d93deee3296f88cca0c0e10c6789bc2683c"
+      ARTIFACT_DIR: "/artifacts"
+      HF_HOME: "/tmp/hf"
+    resources:
+      requests: {cpu: "250m", memory: "384Mi"}
+      limits: {cpu: "1", memory: "768Mi"}
+    probes:
+      readiness: "/readyz"
+      liveness: "/healthz"
+      # services.recommender.probes.startup gives a slow model load up to 60 s.
+      startup: true
+    terminationGracePeriodSeconds: 30
+    # services.recommender.fetchArtifacts adds the init container that downloads the model.
+    fetchArtifacts:
+      enabled: true
+      sizeLimit: "256Mi"
+      resources:
+        requests: {cpu: "100m", memory: "128Mi"}
+        limits: {cpu: "500m", memory: "512Mi"}
+    # services.recommender.scratch lists writable emptyDirs (the root filesystem is read-only).
+    scratch:
+      - {name: tmp, mountPath: /tmp, sizeLimit: 64Mi}
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      cpuUtilization: 70
+
+  explainer:
+    replicas: 2
+    port: 8000
+    runAsUser: 10001
+    config:
+      VLLM_BASE_URL: ""
+      LLM_MODEL: "qwen3-8b-awq"
+      LLM_TIMEOUT_S: "15"
+      LLM_DEADLINE_S: "30"
+      LLM_RETRIES: "2"
+    # services.explainer.secretName is loaded with envFrom if it exists (optional).
+    secretName: "explainer-llm"
+    resources:
+      requests: {cpu: "50m", memory: "128Mi"}
+      limits: {cpu: "500m", memory: "256Mi"}
+    probes:
+      readiness: "/readyz"
+      liveness: "/healthz"
+      startup: false
+    terminationGracePeriodSeconds: 45
+    fetchArtifacts:
+      enabled: false
+    scratch:
+      - {name: tmp, mountPath: /tmp, sizeLimit: 16Mi}
+    hpa:
+      enabled: false
+
+  frontend:
+    replicas: 2
+    port: 8080
+    runAsUser: 101
+    config:
+      RECOMMENDER_URL: "http://recommender:8000"
+      EXPLAINER_URL: "http://explainer:8000"
+    resources:
+      requests: {cpu: "25m", memory: "32Mi"}
+      limits: {cpu: "250m", memory: "128Mi"}
+    probes:
+      readiness: "/readyz"
+      liveness: "/healthz"
+      startup: false
+    terminationGracePeriodSeconds: 30
+    fetchArtifacts:
+      enabled: false
+    scratch:
+      - {name: conf, mountPath: /etc/nginx/conf.d, sizeLimit: 1Mi}
+      - {name: tmp, mountPath: /tmp, sizeLimit: 64Mi}
+    hpa:
+      enabled: false
+
+# llmApiKey, if set, makes the chart create the explainer's Secret. Leave it empty and
+# create the Secret out of band (`make secrets`), so the key never sits in a values file.
+llmApiKey: ""
+
+# gateway configures the Gateway API objects (Envoy Gateway implements class "eg").
+gateway:
+  enabled: true
+  className: "eg"
+  # gateway.serviceType is the Envoy Service type: NodePort on kind, LoadBalancer on AKS.
+  serviceType: "LoadBalancer"
+  # gateway.nodePort pins the NodePort (only used when serviceType is NodePort).
+  nodePort: 30080
+  # gateway.explainTimeout bounds a request to the explainer; it gives up on the LLM at 30 s.
+  explainTimeout: "60s"
