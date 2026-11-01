@@ -18,7 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-BASE = "http://localhost:8080"
+BASE = "http://localhost:8088"
 NS = "reel-history"
 DEPLOYMENTS = ("recommender", "explainer", "frontend")
 LOAD_THREADS = 4

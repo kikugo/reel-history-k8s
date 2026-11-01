@@ -68,7 +68,7 @@ def test_deployments_follow_the_baseline(docs):
             assert {"cpu", "memory"} <= set(c["resources"]["requests"]) and c["resources"]["limits"], c["name"]
             tag = c["image"].rsplit(":", 1)[1]
             assert tag and tag != "latest", c["image"]
-        (app,) = pod["containers"]
+        app = next(c for c in pod["containers"] if c["name"] == name)
         assert app["readinessProbe"]["httpGet"]["path"] == "/readyz", name
         assert app["livenessProbe"]["httpGet"]["path"] == "/healthz", name
         assert app["lifecycle"]["preStop"]["sleep"]["seconds"] > 0, name
@@ -140,4 +140,4 @@ def test_hpa_owned_deployments_omit_replicas():
 def test_kind_maps_the_gateway_nodeport():
     cluster = yaml.safe_load((ROOT / "kind" / "cluster.yaml").read_text())
     (mapping,) = cluster["nodes"][0]["extraPortMappings"]
-    assert mapping["containerPort"] == 30080 and mapping["listenAddress"] == "127.0.0.1"
+    assert mapping["containerPort"] == 30080 and mapping["hostPort"] == 8088 and mapping["listenAddress"] == "127.0.0.1"
