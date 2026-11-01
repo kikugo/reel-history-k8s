@@ -1,0 +1,13 @@
+{{- /* Grafana's sidecar (kube-prometheus-stack) imports ConfigMaps carrying this label. */ -}}
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reel-history-dashboard
+  labels:
+    {{- include "rh.labels" (list $ "dashboard") | nindent 4 }}
+    {{ .Values.monitoring.dashboardLabel }}: "1"
+data:
+  reel-history.json: |-
+    {{- .Files.Get "dashboards/reel-history.json" | nindent 4 }}
+{{- end }}
