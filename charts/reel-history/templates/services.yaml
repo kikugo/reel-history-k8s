@@ -104,6 +104,26 @@ spec:
             {{- range $svc.scratch }}
             - {name: {{ .name }}, mountPath: {{ .mountPath }}}
             {{- end }}
+        {{- if and $svc.exporter $svc.exporter.enabled }}
+        - name: metrics-exporter
+          image: {{ $svc.exporter.image }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          args:
+            - --nginx.scrape-uri={{ $svc.exporter.scrapeUri }}
+            - --web.listen-address=:{{ $svc.exporter.port }}
+          ports:
+            - {name: metrics, containerPort: {{ $svc.exporter.port }}}
+          resources:
+            {{- toYaml $svc.exporter.resources | nindent 12 }}
+          securityContext:
+            {{- include "rh.containerSecurity" . | nindent 12 }}
+          readinessProbe:
+            httpGet: {path: /metrics, port: metrics}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /metrics, port: metrics}
+            periodSeconds: 20
+        {{- end }}
       volumes:
         {{- if $svc.fetchArtifacts.enabled }}
         - name: artifacts
@@ -125,5 +145,8 @@ spec:
     {{- include "rh.selector" (list $ $name) | nindent 4 }}
   ports:
     - {name: http, port: {{ $svc.port }}, targetPort: http}
+    {{- if and $svc.exporter $svc.exporter.enabled }}
+    - {name: metrics, port: {{ $svc.exporter.port }}, targetPort: metrics}
+    {{- end }}
 ---
 {{- end }}
