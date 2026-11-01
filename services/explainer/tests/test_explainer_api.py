@@ -173,3 +173,10 @@ def test_ttl_cache_expires_and_evicts():
     assert cache.get("b") is None and len(cache) == 2
     now[0] = 11
     assert cache.get("a") is None
+
+
+def test_latency_histogram_resolves_200ms():
+    with make_client(None, Settings()) as c:
+        c.post("/explain", json=BODY)
+        body = c.get("/metrics").text
+    assert 'http_request_duration_seconds_bucket{handler="/explain",le="0.2",method="POST"}' in body
