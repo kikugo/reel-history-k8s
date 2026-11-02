@@ -81,10 +81,10 @@ monitoring:
 		--version $(KPS) -n monitoring --create-namespace -f k8s/platform/kube-prometheus-stack-values.yaml \
 		--wait --timeout 10m
 
-# Grafana on http://localhost:3000 (user admin; password: kubectl -n monitoring get secret kps-grafana
+# Grafana on http://localhost:13000 (3000 is often taken; user admin; password: kubectl -n monitoring get secret kps-grafana
 # -o jsonpath='{.data.admin-password}' | base64 -d)
 grafana:
-	kubectl -n monitoring port-forward svc/kps-grafana 3000:80
+	kubectl -n monitoring port-forward svc/kps-grafana 13000:80
 
 # Prometheus on http://localhost:19090 (9090 is often taken by other local stacks)
 prometheus:
