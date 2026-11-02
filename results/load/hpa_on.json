@@ -1,0 +1,253 @@
+{
+  "mode": "hpa-on",
+  "started_utc": "2026-11-02T15:39:30+00:00",
+  "k6_image": "grafana/k6:2.3.0",
+  "path": "k6 (kind network) -> Envoy NodePort -> recommender",
+  "criteria": {
+    "p95_ms_below": 200.0,
+    "error_rate_below": 0.01,
+    "dropped_share_at_most": 0.01,
+    "warm_s": 60,
+    "measure_s": 60
+  },
+  "docker_cpus": 12,
+  "docker_mem_gib": 11.7,
+  "steps": [
+    {
+      "offered_rps": 100,
+      "achieved_rps": 100.0,
+      "requests": 6001,
+      "p50_ms": 2.28,
+      "p95_ms": 5.07,
+      "p99_ms": 28.18,
+      "max_ms": 450.58,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "recommender_replicas": 2,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-mtpwt": 118,
+        "recommender-699b8b8d94-tpqgm": 114
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 55
+      },
+      "node_cpu_m": 674,
+      "passed": true
+    },
+    {
+      "offered_rps": 200,
+      "achieved_rps": 200.0,
+      "requests": 12001,
+      "p50_ms": 1.8,
+      "p95_ms": 2.48,
+      "p99_ms": 3.74,
+      "max_ms": 20.39,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "recommender_replicas": 2,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-mtpwt": 168,
+        "recommender-699b8b8d94-tpqgm": 156
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 65
+      },
+      "node_cpu_m": 628,
+      "passed": true
+    },
+    {
+      "offered_rps": 400,
+      "achieved_rps": 400.0,
+      "requests": 24001,
+      "p50_ms": 1.56,
+      "p95_ms": 2.09,
+      "p99_ms": 3.3,
+      "max_ms": 19.15,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "recommender_replicas": 4,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-lw7qg": 152,
+        "recommender-699b8b8d94-mtpwt": 154,
+        "recommender-699b8b8d94-rrmkt": 219,
+        "recommender-699b8b8d94-tpqgm": 138
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 88
+      },
+      "node_cpu_m": 846,
+      "passed": true
+    },
+    {
+      "offered_rps": 600,
+      "achieved_rps": 600.0,
+      "requests": 36000,
+      "p50_ms": 1.76,
+      "p95_ms": 5.79,
+      "p99_ms": 86.42,
+      "max_ms": 580.8,
+      "error_rate": 3e-05,
+      "dropped_iterations": 0,
+      "recommender_replicas": 5,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-8w6sq": 200,
+        "recommender-699b8b8d94-lw7qg": 202,
+        "recommender-699b8b8d94-mtpwt": 196,
+        "recommender-699b8b8d94-rrmkt": 189,
+        "recommender-699b8b8d94-tpqgm": 189
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 150
+      },
+      "node_cpu_m": 1415,
+      "passed": true
+    },
+    {
+      "offered_rps": 800,
+      "achieved_rps": 800.0,
+      "requests": 48001,
+      "p50_ms": 1.66,
+      "p95_ms": 2.54,
+      "p99_ms": 7.49,
+      "max_ms": 50.59,
+      "error_rate": 2e-05,
+      "dropped_iterations": 0,
+      "recommender_replicas": 5,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-8w6sq": 249,
+        "recommender-699b8b8d94-lw7qg": 243,
+        "recommender-699b8b8d94-mtpwt": 264,
+        "recommender-699b8b8d94-rrmkt": 245,
+        "recommender-699b8b8d94-tpqgm": 257
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 179
+      },
+      "node_cpu_m": 1869,
+      "passed": true
+    },
+    {
+      "offered_rps": 1000,
+      "achieved_rps": 1000.0,
+      "requests": 60001,
+      "p50_ms": 1.55,
+      "p95_ms": 2.21,
+      "p99_ms": 7.95,
+      "max_ms": 152.17,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "recommender_replicas": 5,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-8w6sq": 307,
+        "recommender-699b8b8d94-lw7qg": 308,
+        "recommender-699b8b8d94-mtpwt": 287,
+        "recommender-699b8b8d94-rrmkt": 287,
+        "recommender-699b8b8d94-tpqgm": 274
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 189
+      },
+      "node_cpu_m": 1990,
+      "passed": true
+    },
+    {
+      "offered_rps": 1200,
+      "achieved_rps": 1200.0,
+      "requests": 72001,
+      "p50_ms": 1.67,
+      "p95_ms": 2.99,
+      "p99_ms": 15.21,
+      "max_ms": 244.28,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "recommender_replicas": 5,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-8w6sq": 369,
+        "recommender-699b8b8d94-lw7qg": 378,
+        "recommender-699b8b8d94-mtpwt": 376,
+        "recommender-699b8b8d94-rrmkt": 370,
+        "recommender-699b8b8d94-tpqgm": 388
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 258
+      },
+      "node_cpu_m": 2522,
+      "passed": true
+    },
+    {
+      "offered_rps": 1500,
+      "achieved_rps": 1500.0,
+      "requests": 90001,
+      "p50_ms": 1.6,
+      "p95_ms": 3.27,
+      "p99_ms": 21.88,
+      "max_ms": 142.79,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "recommender_replicas": 5,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-8w6sq": 440,
+        "recommender-699b8b8d94-lw7qg": 427,
+        "recommender-699b8b8d94-mtpwt": 432,
+        "recommender-699b8b8d94-rrmkt": 422,
+        "recommender-699b8b8d94-tpqgm": 425
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 266
+      },
+      "node_cpu_m": 2914,
+      "passed": true
+    },
+    {
+      "offered_rps": 1800,
+      "achieved_rps": 1800.0,
+      "requests": 108001,
+      "p50_ms": 1.59,
+      "p95_ms": 5.27,
+      "p99_ms": 33.59,
+      "max_ms": 129.39,
+      "error_rate": 2e-05,
+      "dropped_iterations": 0,
+      "recommender_replicas": 5,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-8w6sq": 519,
+        "recommender-699b8b8d94-lw7qg": 508,
+        "recommender-699b8b8d94-mtpwt": 516,
+        "recommender-699b8b8d94-rrmkt": 511,
+        "recommender-699b8b8d94-tpqgm": 521
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 315
+      },
+      "node_cpu_m": 3258,
+      "passed": true
+    },
+    {
+      "offered_rps": 2200,
+      "achieved_rps": 2180.5,
+      "requests": 130828,
+      "p50_ms": 2.6,
+      "p95_ms": 834.22,
+      "p99_ms": 1832.21,
+      "max_ms": 4703.53,
+      "error_rate": 0.00143,
+      "dropped_iterations": 1173,
+      "recommender_replicas": 5,
+      "recommender_cpu_m": {
+        "recommender-699b8b8d94-8w6sq": 767,
+        "recommender-699b8b8d94-lw7qg": 753,
+        "recommender-699b8b8d94-mtpwt": 858,
+        "recommender-699b8b8d94-rrmkt": 721,
+        "recommender-699b8b8d94-tpqgm": 822
+      },
+      "envoy_cpu_m": {
+        "envoy-reel-history-reel-history-5eb91f1f-6dbc46dd5c-6n6vh": 506
+      },
+      "node_cpu_m": 5410,
+      "passed": false
+    }
+  ],
+  "sustained_rps": 1800,
+  "sustained_achieved_rps": 1800.0,
+  "finished_utc": "2026-11-02T15:59:55+00:00"
+}
