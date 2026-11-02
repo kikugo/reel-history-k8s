@@ -1,0 +1,7 @@
+# the build context is services/; send only what this image needs
+*
+!recommender/recommender
+!kserve-predictor/kserve_recommender
+!kserve-predictor/pyproject.toml
+!kserve-predictor/uv.lock
+**/__pycache__
