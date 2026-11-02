@@ -72,3 +72,11 @@ def test_plot_writes_a_png(tmp_path):
     out = tmp_path / "chart.png"
     report.plot(fixture_data(), out)
     assert out.read_bytes()[:4] == b"\x89PNG"
+
+
+def test_wall_clock_guard_rejects_a_slept_run():
+    import time
+
+    load_test.check_wall_clock(time.time() - 100, planned_s=120)  # on time: fine
+    with pytest.raises(RuntimeError, match="probably slept"):
+        load_test.check_wall_clock(time.time() - 5000, planned_s=120)

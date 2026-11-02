@@ -64,14 +64,27 @@ def cpu_millicores(selector: str, ns: str = NS) -> dict[str, int]:
     return {line.split()[0]: int(line.split()[1].rstrip("m")) for line in out.splitlines() if line.strip()}
 
 
-def run_k6(env: dict, out_dir: Path, extra: tuple[str, ...] = ()) -> dict:
+def check_wall_clock(started: float, planned_s: int) -> None:
+    """Refuse a run that took far longer on the wall clock than planned: the laptop slept.
+
+    time.time(), not time.monotonic(): on macOS the monotonic clock stops while asleep.
+    """
+    took = time.time() - started
+    if took > planned_s * 1.5 + 60:
+        raise RuntimeError(f"run took {took:.0f} s for a planned {planned_s} s; the machine probably slept, "
+                           "so this result would be wrong. Rerun it under `caffeinate -i`.")
+
+
+def run_k6(env: dict, out_dir: Path, planned_s: int, extra: tuple[str, ...] = ()) -> dict:
     args = ["docker", "run", "--rm", "--network", "kind", "-v", f"{ROOT / 'load'}:/scripts:ro",
             "-v", f"{out_dir}:/out", "-w", "/scripts"]
     for k, v in env.items():
         args += ["-e", f"{k}={v}"]
     args += [K6_IMAGE, "run", "--quiet", *extra, "recommender.js"]
+    started = time.time()
     # exit 99 means a threshold failed, which is a result, not an error
     proc = subprocess.run(args, capture_output=True, text=True, timeout=1800, check=False)
+    check_wall_clock(started, planned_s)
     if proc.returncode not in (0, 99):
         raise RuntimeError(f"k6 exited {proc.returncode}: {proc.stderr[-2000:]}")
     return json.loads((out_dir / "summary.json").read_text())["metrics"]
@@ -111,15 +124,38 @@ def sustained(steps: list[dict]) -> dict | None:
     return best
 
 
+def cool_down(max_m: int = 50, timeout_s: int = 420) -> None:
+    """Wait until every recommender pod is idle again.
+
+    A new HPA reads the last minute of CPU. Enabled straight after a run that saturated the pods, it
+    sees the leftover load, jumps to maxReplicas, and its 5-minute scale-down window keeps it there.
+    """
+    end = time.monotonic() + timeout_s
+    while time.monotonic() < end:
+        try:
+            if all(m <= max_m for m in cpu_millicores("app.kubernetes.io/name=recommender").values()):
+                return
+        except subprocess.CalledProcessError:
+            pass
+        time.sleep(10)
+    raise TimeoutError("recommender CPU never settled")
+
+
+def node_cpu_m() -> int:
+    return int(sh("kubectl", "top", "node", "--no-headers").split()[1].rstrip("m"))
+
+
 def step_mode(hpa: bool) -> dict:
     set_hpa(False)  # pins replicas back to 2, so both modes start from the same place
     wait_replicas(2)
+    cool_down()
     if hpa:
         set_hpa(True)
     steps = []
     for rate in STEPS:
         with tempfile.TemporaryDirectory() as tmp:
-            metrics = run_k6({"RATE": rate, "WARM": f"{WARM_S}s", "MEASURE": f"{MEASURE_S}s"}, Path(tmp))
+            metrics = run_k6({"RATE": rate, "WARM": f"{WARM_S}s", "MEASURE": f"{MEASURE_S}s"}, Path(tmp),
+                             WARM_S + MEASURE_S)
         step = window_stats(metrics, "measure", MEASURE_S, rate)
         dep = kubectl_json("get", "deployment", "recommender")["status"]
         step["recommender_replicas"] = dep.get("readyReplicas", 0)
@@ -127,6 +163,7 @@ def step_mode(hpa: bool) -> dict:
             step["recommender_cpu_m"] = cpu_millicores("app.kubernetes.io/name=recommender")
             step["envoy_cpu_m"] = cpu_millicores("gateway.envoyproxy.io/owning-gateway-name=reel-history",
                                                  ns="envoy-gateway-system")
+            step["node_cpu_m"] = node_cpu_m()  # the whole kind node: shows when the laptop is the limit
         except subprocess.CalledProcessError:
             pass  # metrics-server can lag right after a scale-up; the step result stands
         step["passed"] = step_passes(step)
@@ -191,7 +228,7 @@ def pod_kill_mode() -> dict:
     with tempfile.TemporaryDirectory() as tmp:
         t = threading.Thread(target=killer, daemon=True)
         t.start()
-        metrics = run_k6({"RATE": rate, "MODE": "steady", "DURATION": f"{STEADY_S}s"}, Path(tmp),
+        metrics = run_k6({"RATE": rate, "MODE": "steady", "DURATION": f"{STEADY_S}s"}, Path(tmp), STEADY_S,
                          ("--out", "csv=/out/requests.csv.gz"))
         t.join(timeout=300)
         series = per_second(Path(tmp) / "requests.csv.gz", kill["ts"])
@@ -218,7 +255,8 @@ def main() -> None:
               "path": "k6 (kind network) -> Envoy NodePort -> recommender",
               "criteria": {"p95_ms_below": P95_LIMIT_MS, "error_rate_below": MAX_ERROR_RATE,
                            "dropped_share_at_most": MAX_DROPPED, "warm_s": WARM_S, "measure_s": MEASURE_S},
-              "docker_cpus": int(sh("docker", "info", "--format", "{{.NCPU}}").strip())}
+              "docker_cpus": int(sh("docker", "info", "--format", "{{.NCPU}}").strip()),
+              "docker_mem_gib": round(int(sh("docker", "info", "--format", "{{.MemTotal}}").strip()) / 2**30, 1)}
     try:
         if mode == "pod-kill":
             record.update(pod_kill_mode())
