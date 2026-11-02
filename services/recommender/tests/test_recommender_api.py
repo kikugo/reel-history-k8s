@@ -79,3 +79,9 @@ def test_split_title():
     assert split_title("Matrix, The (1999)") == ("The Matrix", 1999)
     assert split_title("Amour (2012)") == ("Amour", 2012)
     assert split_title("Untitled Film") == ("Untitled Film", None)
+
+
+def test_latency_histogram_resolves_200ms(client):
+    client.post("/recommend", json={"liked": [10]})
+    body = client.get("/metrics").text
+    assert 'http_request_duration_seconds_bucket{handler="/recommend",le="0.2",method="POST"}' in body

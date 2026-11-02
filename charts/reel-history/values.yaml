@@ -26,6 +26,8 @@ services:
       HF_REVISION: "c0509d93deee3296f88cca0c0e10c6789bc2683c"
       ARTIFACT_DIR: "/artifacts"
       HF_HOME: "/tmp/hf"
+    # services.recommender.metricsPort names the Service port Prometheus scrapes at /metrics.
+    metricsPort: "http"
     resources:
       requests: {cpu: "250m", memory: "384Mi"}
       limits: {cpu: "1", memory: "768Mi"}
@@ -63,6 +65,7 @@ services:
       LLM_RETRIES: "2"
     # services.explainer.secretName is loaded with envFrom if it exists (optional).
     secretName: "explainer-llm"
+    metricsPort: "http"
     resources:
       requests: {cpu: "50m", memory: "128Mi"}
       limits: {cpu: "500m", memory: "256Mi"}
@@ -85,6 +88,16 @@ services:
     config:
       RECOMMENDER_URL: "http://recommender:8000"
       EXPLAINER_URL: "http://explainer:8000"
+    # nginx has no /metrics of its own: a sidecar turns its stub_status page into Prometheus metrics.
+    metricsPort: "metrics"
+    exporter:
+      enabled: true
+      image: "nginx/nginx-prometheus-exporter:1.5.1"
+      port: 9113
+      scrapeUri: "http://127.0.0.1:8080/nginx_status"
+      resources:
+        requests: {cpu: "10m", memory: "16Mi"}
+        limits: {cpu: "100m", memory: "64Mi"}
     resources:
       requests: {cpu: "25m", memory: "32Mi"}
       limits: {cpu: "250m", memory: "128Mi"}
@@ -104,6 +117,15 @@ services:
 # llmApiKey, if set, makes the chart create the explainer's Secret. Leave it empty and
 # create the Secret out of band (`make secrets`), so the key never sits in a values file.
 llmApiKey: ""
+
+# monitoring adds a ServiceMonitor per service and the Grafana dashboard ConfigMap. Needs
+# kube-prometheus-stack (the ServiceMonitor CRD) in the cluster; skipped when the CRD is absent.
+monitoring:
+  enabled: false
+  # monitoring.interval is how often Prometheus scrapes each pod.
+  interval: "15s"
+  # monitoring.dashboardLabel is the label Grafana's sidecar watches for.
+  dashboardLabel: "grafana_dashboard"
 
 # gateway configures the Gateway API objects (Envoy Gateway implements class "eg").
 gateway:

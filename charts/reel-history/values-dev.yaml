@@ -7,3 +7,6 @@ image:
 gateway:
   serviceType: "NodePort"
   nodePort: 30080
+
+monitoring:
+  enabled: true

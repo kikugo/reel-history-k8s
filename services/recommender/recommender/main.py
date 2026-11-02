@@ -19,6 +19,11 @@ from recommender.model import Recommender
 log = logging.getLogger("recommender")
 
 
+
+# Edges of the per-handler latency histogram. The library default (0.1, 0.5, 1 s) can't
+# resolve a 200 ms p95, which is what the Phase 6 load test is judged on.
+LATENCY_BUCKETS = (0.005, 0.01, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2.5, 5, 10, 30)
+
 class RecommendRequest(BaseModel):
     liked: list[int] = Field(default_factory=list, max_length=500, description="movieIds, oldest first")
     k: int = Field(default=10, ge=1, le=50)
@@ -44,7 +49,7 @@ def create_app(artifact_dir: Path | None = None) -> FastAPI:
     # one registry per app, so tests can build several apps in one process
     registry = CollectorRegistry()
     Instrumentator(excluded_handlers=["/metrics", "/healthz", "/readyz"], registry=registry).instrument(
-        app).expose(app, include_in_schema=False)
+        app, latency_lowr_buckets=LATENCY_BUCKETS).expose(app, include_in_schema=False)
 
     def model() -> Recommender:
         if getattr(app.state, "model", None) is None:

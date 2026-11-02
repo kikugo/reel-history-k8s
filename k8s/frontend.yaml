@@ -73,6 +73,30 @@ spec:
           volumeMounts:
             - {name: conf, mountPath: /etc/nginx/conf.d}
             - {name: tmp, mountPath: /tmp}
+        # nginx has no /metrics of its own: this sidecar reads stub_status over localhost
+        # and serves it in Prometheus format on 9113.
+        - name: metrics-exporter
+          image: nginx/nginx-prometheus-exporter:1.5.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - --nginx.scrape-uri=http://127.0.0.1:8080/nginx_status
+            - --web.listen-address=:9113
+          ports:
+            - {name: metrics, containerPort: 9113}
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits: {cpu: 100m, memory: 64Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet: {path: /metrics, port: metrics}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /metrics, port: metrics}
+            periodSeconds: 20
       volumes:
         - name: conf
           emptyDir: {sizeLimit: 1Mi}
@@ -92,3 +116,4 @@ spec:
     app.kubernetes.io/name: frontend
   ports:
     - {name: http, port: 8080, targetPort: http}
+    - {name: metrics, port: 9113, targetPort: metrics}

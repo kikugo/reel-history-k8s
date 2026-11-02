@@ -21,6 +21,9 @@ from explainer.cache import TTLCache, cache_key
 from explainer.llm import LLMClient, LLMError
 from explainer.prompt import Film, build_prompt
 
+# Edges of the per-handler latency histogram. The library default (0.1, 0.5, 1 s) can't
+# resolve a 200 ms p95, which is what the Phase 6 load test is judged on.
+LATENCY_BUCKETS = (0.005, 0.01, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2.5, 5, 10, 30)
 
 class ExplainRequest(BaseModel):
     liked: list[Film] = Field(min_length=1, max_length=10)
@@ -74,7 +77,7 @@ def create_app(settings: Settings | None = None, transport: httpx.AsyncBaseTrans
     app.state.cache = TTLCache(settings.cache_size, settings.cache_ttl_s)
     app.state.last_llm = {"ok": None, "reason": None, "at": None}
     Instrumentator(excluded_handlers=["/metrics", "/healthz", "/readyz"], registry=registry).instrument(
-        app).expose(app, include_in_schema=False)
+        app, latency_lowr_buckets=LATENCY_BUCKETS).expose(app, include_in_schema=False)
 
     @app.get("/healthz")
     def healthz():
