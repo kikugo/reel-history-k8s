@@ -100,13 +100,13 @@ def plot(data: dict, path: Path = CHART) -> None:
     plt.close(fig)
 
 
-def update_readme(block: str, readme: Path = README) -> None:
+def update_readme(block: str, readme: Path = README, start: str = START, end: str = END) -> None:
     text = readme.read_text()
-    if START not in text or END not in text:
-        raise SystemExit(f"{readme} has no {START} / {END} markers")
-    head, rest = text.split(START, 1)
-    _, tail = rest.split(END, 1)
-    readme.write_text(f"{head}{START}\n{block}\n{END}{tail}")
+    if start not in text or end not in text:
+        raise SystemExit(f"{readme} has no {start} / {end} markers")
+    head, rest = text.split(start, 1)
+    _, tail = rest.split(end, 1)
+    readme.write_text(f"{head}{start}\n{block}\n{end}{tail}")
 
 
 def main() -> None:
