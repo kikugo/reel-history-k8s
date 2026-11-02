@@ -179,3 +179,41 @@ make kind-down
 ```
 
 `make check` writes its record to `results/k8s/kind_check.json`.
+
+### Part 2: monitoring and load test (Phase 6)
+
+kube-prometheus-stack scrapes all three services through ServiceMonitors from the chart (the frontend through an nginx exporter sidecar), and the Grafana dashboard in `charts/reel-history/dashboards/reel-history.json` shows request rate, p95 latency, 5xx ratio, pods, HPA replicas, recommender CPU and the explainer's cache hit rate. `scripts/check_dashboard.py` checks every panel query against the live Prometheus.
+
+```bash
+make monitoring                     # kube-prometheus-stack
+make grafana                        # http://localhost:13000
+uv run python scripts/check_dashboard.py
+```
+
+<!-- LOAD:START -->
+k6 against the recommender through Envoy on the kind cluster. Open-model load at a fixed rate; each step warms for 60 s and is judged on the next 60 s: p95 under 200 ms, errors under 1%, and k6 able to send what it offered. Everything shares one laptop (12 cores in Docker Desktop), so these say what this machine sustains, and the two modes compare fairly with each other.
+
+| | Sustained req/s at p95 < 200 ms | Achieved req/s | p95 at that rate (ms) | Recommender pods |
+|---|---|---|---|---|
+| HPA off (2 replicas) | 1,500 | 1,500 | 2.0 | 2 |
+| HPA on (2-5 replicas) | 1,800 | 1,800 | 5.3 | 5 |
+
+| Offered req/s | HPA off p95 (ms) | HPA off | HPA on p95 (ms) | HPA on pods | HPA on |
+|---|---|---|---|---|---|
+| 100 | 2.3 | pass | 5.1 | 2 | pass |
+| 200 | 2.1 | pass | 2.5 | 2 | pass |
+| 400 | 1.7 | pass | 2.1 | 4 | pass |
+| 600 | 1.7 | pass | 5.8 | 5 | pass |
+| 800 | 1.7 | pass | 2.5 | 5 | pass |
+| 1,000 | 1.8 | pass | 2.2 | 5 | pass |
+| 1,200 | 1.7 | pass | 3.0 | 5 | pass |
+| 1,500 | 2.0 | pass | 3.3 | 5 | pass |
+| 1,800 | 4138.3 | **fail** | 5.3 | 5 | pass |
+| 2,200 |  |  | 834.2 | 5 | **fail** |
+
+**Pod kill:** a steady 1,250 req/s for 240 s with the HPA on; `recommender-699b8b8d94-gx8cf` was deleted 90 s in. 2 of 300,001 requests failed (0 in the 30 s after the kill). Worst per-second p95: 210.6 ms in the 30 s before, 63.1 ms in the 30 s after. The Deployment was back to 5 ready pods 6.6 s later.
+
+![p95 latency vs offered rate](results/load/p95_vs_rate.png)
+
+Rerun: `uv run python scripts/load_test.py --mode hpa-off` (then `hpa-on`, `pod-kill`), then `uv run python -m load.report`.
+<!-- LOAD:END -->
