@@ -193,7 +193,8 @@
             "fillOpacity": 5,
             "thresholdsStyle": {
               "mode": "line+area"
-            }
+            },
+            "axisSoftMax": 0.05
           },
           "thresholds": {
             "mode": "absolute",
@@ -207,7 +208,9 @@
                 "value": 0.01
               }
             ]
-          }
+          },
+          "min": 0,
+          "decimals": 2
         },
         "overrides": []
       },
@@ -473,8 +476,11 @@
           "unit": "percentunit",
           "custom": {
             "lineWidth": 2,
-            "fillOpacity": 5
-          }
+            "fillOpacity": 5,
+            "axisSoftMax": 1
+          },
+          "min": 0,
+          "decimals": 2
         },
         "overrides": []
       },
