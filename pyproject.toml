@@ -21,12 +21,14 @@ dev = [
     "faiss-cpu>=1.12",
     "huggingface_hub>=1.0",
     "prometheus-fastapi-instrumentator>=7.1",
+    # the Phase 7 KServe predictor (pins pandas < 3 for the test env; the recommender image keeps its own lock)
+    "kserve==0.21.0",
     "pyyaml>=6.0.3",
 ]
 
 [tool.pytest.ini_options]
-pythonpath = [".", "services/recommender", "services/explainer"]
-testpaths = ["tests", "services/recommender/tests", "services/explainer/tests"]
+pythonpath = [".", "services/recommender", "services/explainer", "services/kserve-predictor"]
+testpaths = ["tests", "services/recommender/tests", "services/explainer/tests", "services/kserve-predictor/tests"]
 # each service has its own tests/conftest.py; importlib mode keeps them from colliding
 addopts = ["--import-mode=importlib"]
 
@@ -34,4 +36,4 @@ addopts = ["--import-mode=importlib"]
 line-length = 110
 
 [tool.ruff.lint.isort]
-known-first-party = ["quant", "serve", "bench", "recommender", "explainer"]
+known-first-party = ["quant", "serve", "bench", "recommender", "explainer", "kserve_recommender", "load"]
