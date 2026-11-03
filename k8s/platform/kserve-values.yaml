@@ -1,0 +1,15 @@
+# KServe in Standard mode (formerly RawDeployment): plain Deployments, Services and an
+# HTTPRoute on our existing Envoy Gateway; no Knative, no Istio. (make kserve)
+kserve:
+  controller:
+    deploymentMode: Standard
+    gateway:
+      domain: kserve.local
+      ingressGateway:
+        enableGatewayApi: true
+        # reuse the app's Gateway instead of creating a second Envoy
+        kserveGateway: reel-history/reel-history
+        createGateway: false
+    resources:
+      requests: {cpu: 50m, memory: 128Mi}
+      limits: {cpu: 500m, memory: 512Mi}

@@ -80,3 +80,31 @@ def test_wall_clock_guard_rejects_a_slept_run():
     load_test.check_wall_clock(time.time() - 100, planned_s=120)  # on time: fine
     with pytest.raises(RuntimeError, match="probably slept"):
         load_test.check_wall_clock(time.time() - 5000, planned_s=120)
+
+
+def kserve_fixture():
+    def run(target, rate, p95):
+        return {"target": target, "offered_rps": rate, "p50_ms": p95 / 2, "p95_ms": p95, "p99_ms": p95 * 2,
+                "error_rate": 0.0, "valid": True}
+    return {"replicas": 2, "warm_s": 60, "measure_s": 60, "rates": [200, 800], "same_results": True,
+            "runs": [run("plain", 200, 2.0), run("kserve", 200, 3.5), run("plain", 800, 2.5),
+                     {**run("kserve", 800, 9.0), "valid": False}],
+            "footprint": {"plain": {"image_mb": 632, "idle_mem_mib_per_pod": 155},
+                          "kserve": {"image_mb": 905, "idle_mem_mib_per_pod": 170},
+                          "kserve_addons": {"kserve": {"pods": 1, "mem_mib": 66},
+                                            "cert-manager": {"pods": 3, "mem_mib": 160}, "crds": 12}},
+            "seconds_to_ready": {"plain": 12.0, "kserve": 15.5}}
+
+
+def test_kserve_report_renders_from_the_json(tmp_path):
+    from load import kserve_report
+
+    text = kserve_report.render(kserve_fixture())
+    assert "| 200 | 1.0 / 2.0 / 4.0 | 1.8 / 3.5 / 7.0 | 0.00% | 0.00% |" in text
+    assert "4.5 / 9.0 / 18.0 (memory stall)" in text
+    assert "| Image size | 632 MB | 905 MB |" in text
+    assert "4 pods (KServe controller, cert-manager), 226 MiB, 12 CRDs" in text
+    readme = tmp_path / "README.md"
+    readme.write_text(f"a\n{kserve_report.START}\nold\n{kserve_report.END}\nb\n")
+    report.update_readme("new", readme, kserve_report.START, kserve_report.END)
+    assert readme.read_text() == f"a\n{kserve_report.START}\nnew\n{kserve_report.END}\nb\n"

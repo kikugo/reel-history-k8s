@@ -217,3 +217,32 @@ k6 against the recommender through Envoy on the kind cluster. Open-model load at
 
 Rerun: `uv run python scripts/load_test.py --mode hpa-off` (then `hpa-on`, `pod-kill`), then `uv run python -m load.report`.
 <!-- LOAD:END -->
+
+### Part 2: the same model on KServe (Phase 7, optional)
+
+KServe 0.21 in Standard mode (formerly RawDeployment: plain Deployments and an HTTPRoute on the existing Envoy Gateway, no Knative or Istio), with cert-manager for its webhook certificates. Instead of the multi-gigabyte Triton image, `services/kserve-predictor` wraps the recommender's own onnxruntime + FAISS code in a KServe SDK `Model` (v1 protocol), so the comparison below differs only in the serving layer.
+
+```bash
+make kserve kserve-deploy                                   # cert-manager, KServe, the InferenceService
+caffeinate -i uv run python scripts/kserve_compare.py       # writes results/kserve/compare.json
+uv run python -m load.kserve_report
+```
+
+<!-- KSERVE:START -->
+The same GRU4Rec + FAISS code served two ways, 2 pods each, same resources, behind the same Envoy Gateway; k6 sends identical requests to both (each warms for 60 s, then 60 s are measured; runs interleave and start from idle). Both return identical recommendations for the same input.
+
+| Offered req/s | Plain p50 / p95 / p99 (ms) | KServe p50 / p95 / p99 (ms) | Plain errors | KServe errors |
+|---|---|---|---|---|
+| 200 | 1.9 / 3.4 / 7.2 | 1.7 / 2.4 / 4.1 | 0.00% | 0.00% |
+| 800 | 1.5 / 3.5 / 32.9 | 1.4 / 2.7 / 14.8 | 0.00% | 0.00% |
+| 1,200 | 1.4 / 2.2 / 16.7 | 1.4 / 3.0 / 19.6 | 0.00% | 0.00% |
+
+| | Plain Deployment | KServe InferenceService |
+|---|---|---|
+| Image size | 632 MB | 905 MB |
+| Idle memory per pod | 160 MiB | 173 MiB |
+| New pod to Ready (download + load) | 7.0 s | 8.0 s |
+| Extra cluster components | none | 4 pods (KServe controller, cert-manager), 203 MiB, 12 CRDs |
+<!-- KSERVE:END -->
+
+**Which I'd choose here: the plain Deployment.** At the same replicas and resources the two serve the same results at the same latency, so KServe's serving layer costs nothing per request. It does cost a bigger image and a controller, cert-manager and their CRDs in every cluster. For one small CPU model behind an existing gateway, that buys little. KServe earns its place with many models or teams, canary rollouts between model versions, the standard v1/v2 inference protocols, inference graphs, or GPU/LLM serving, none of which this project needs (the LLM already runs on vLLM on Modal). The AKS chart in Phase 8 stays on plain Deployments.

@@ -1,0 +1,78 @@
+# The recommender as a KServe InferenceService in Standard mode (formerly RawDeployment):
+# KServe turns this into a Deployment, a Service and an HTTPRoute on the reel-history Gateway.
+# Same model code, image baseline, resources and replica count as the plain recommender, so the
+# Phase 7 latency comparison differs only in the serving layer.
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: recommender-kserve
+  namespace: reel-history
+  annotations:
+    serving.kserve.io/deploymentMode: Standard
+  labels:
+    app.kubernetes.io/part-of: reel-history
+spec:
+  predictor:
+    minReplicas: 2
+    maxReplicas: 2  # fixed, like the HPA-off run of the plain recommender
+    deploymentStrategy:
+      type: RollingUpdate
+      rollingUpdate: {maxUnavailable: 0, maxSurge: 1}  # integers: the strings in KServe's docs read as bad percentages
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 10001
+      runAsGroup: 10001
+      fsGroup: 10001
+      seccompProfile: {type: RuntimeDefault}
+    terminationGracePeriodSeconds: 30
+    initContainers:
+      - name: fetch-artifacts
+        image: reel-history/kserve-predictor:dev
+        imagePullPolicy: IfNotPresent
+        command: ["python", "-m", "recommender.fetch"]
+        env:
+          - {name: ARTIFACT_DIR, value: /artifacts}
+          - {name: HF_HOME, value: /tmp/hf}
+          - {name: HF_REVISION, value: c0509d93deee3296f88cca0c0e10c6789bc2683c}
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {cpu: 500m, memory: 512Mi}
+        securityContext: &restricted
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities: {drop: ["ALL"]}
+        volumeMounts:
+          - {name: artifacts, mountPath: /artifacts}
+          - {name: tmp, mountPath: /tmp}
+    containers:
+      - name: kserve-container
+        image: reel-history/kserve-predictor:dev
+        imagePullPolicy: IfNotPresent
+        ports:
+          - {name: http1, containerPort: 8080, protocol: TCP}  # http1: Envoy must speak HTTP/1.1 to uvicorn
+        env:
+          - {name: ARTIFACT_DIR, value: /artifacts}
+        resources:
+          requests: {cpu: 250m, memory: 384Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        securityContext: *restricted
+        # KServe's model endpoint answers 200 only once load() has finished
+        readinessProbe:
+          httpGet: {path: /v1/models/recommender, port: 8080}
+          periodSeconds: 5
+          failureThreshold: 2
+        startupProbe:
+          httpGet: {path: /v1/models/recommender, port: 8080}
+          periodSeconds: 2
+          failureThreshold: 30
+        lifecycle:
+          preStop:
+            sleep: {seconds: 5}
+        volumeMounts:
+          - {name: artifacts, mountPath: /artifacts, readOnly: true}
+          - {name: tmp, mountPath: /tmp}
+    volumes:
+      - name: artifacts
+        emptyDir: {sizeLimit: 256Mi}
+      - name: tmp
+        emptyDir: {sizeLimit: 64Mi}

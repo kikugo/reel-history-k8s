@@ -1,0 +1,172 @@
+{
+  "started_utc": "2026-11-02T17:00:41+00:00",
+  "k6_image": "grafana/k6:2.3.0",
+  "path": "k6 (kind network) -> Envoy NodePort -> 2 pods of each target",
+  "replicas": 2,
+  "rates": [
+    200,
+    800,
+    1200
+  ],
+  "warm_s": 60,
+  "measure_s": 60,
+  "docker_mem_gib": 11.7,
+  "same_results": true,
+  "vm_memory_before": {
+    "available_mib": 3170,
+    "swap_used_mib": 1023
+  },
+  "footprint": {
+    "plain": {
+      "image_mb": 632,
+      "idle_mem_mib_per_pod": 160
+    },
+    "kserve": {
+      "image_mb": 905,
+      "idle_mem_mib_per_pod": 173
+    },
+    "kserve_addons": {
+      "kserve": {
+        "pods": 1,
+        "mem_mib": 73
+      },
+      "cert-manager": {
+        "pods": 3,
+        "mem_mib": 130
+      },
+      "crds": 12
+    }
+  },
+  "runs": [
+    {
+      "target": "plain",
+      "offered_rps": 200,
+      "achieved_rps": 200.0,
+      "requests": 12001,
+      "p50_ms": 1.91,
+      "p95_ms": 3.37,
+      "p99_ms": 7.2,
+      "max_ms": 145.54,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "cpu_m": {
+        "recommender-678488894c-jb78d": 160,
+        "recommender-678488894c-tft6g": 170
+      },
+      "memory_stall_share": 0.00482,
+      "passed": true,
+      "valid": true,
+      "attempt": 1
+    },
+    {
+      "target": "kserve",
+      "offered_rps": 200,
+      "achieved_rps": 200.0,
+      "requests": 12001,
+      "p50_ms": 1.67,
+      "p95_ms": 2.44,
+      "p99_ms": 4.08,
+      "max_ms": 28.14,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "cpu_m": {
+        "recommender-kserve-predictor-6d8b9f848b-2qtmp": 146,
+        "recommender-kserve-predictor-6d8b9f848b-b9n79": 149
+      },
+      "memory_stall_share": 0.00155,
+      "passed": true,
+      "valid": true,
+      "attempt": 1
+    },
+    {
+      "target": "plain",
+      "offered_rps": 800,
+      "achieved_rps": 800.0,
+      "requests": 48000,
+      "p50_ms": 1.49,
+      "p95_ms": 3.52,
+      "p99_ms": 32.86,
+      "max_ms": 164.88,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "cpu_m": {
+        "recommender-678488894c-jb78d": 544,
+        "recommender-678488894c-tft6g": 537
+      },
+      "memory_stall_share": 0.00161,
+      "passed": true,
+      "valid": true,
+      "attempt": 1
+    },
+    {
+      "target": "kserve",
+      "offered_rps": 800,
+      "achieved_rps": 800.0,
+      "requests": 48001,
+      "p50_ms": 1.4,
+      "p95_ms": 2.7,
+      "p99_ms": 14.85,
+      "max_ms": 176.56,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "cpu_m": {
+        "recommender-kserve-predictor-6d8b9f848b-b9n79": 511,
+        "recommender-kserve-predictor-6d8b9f848b-q8czp": 517
+      },
+      "memory_stall_share": 0.00038,
+      "passed": true,
+      "valid": true,
+      "attempt": 1,
+      "remeasured_utc": "2026-11-02T17:21:50+00:00"
+    },
+    {
+      "target": "plain",
+      "offered_rps": 1200,
+      "achieved_rps": 1200.0,
+      "requests": 72000,
+      "p50_ms": 1.37,
+      "p95_ms": 2.21,
+      "p99_ms": 16.73,
+      "max_ms": 73.21,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "cpu_m": {
+        "recommender-678488894c-jb78d": 715,
+        "recommender-678488894c-tft6g": 716
+      },
+      "memory_stall_share": 0.00053,
+      "passed": true,
+      "valid": true,
+      "attempt": 1
+    },
+    {
+      "target": "kserve",
+      "offered_rps": 1200,
+      "achieved_rps": 1200.0,
+      "requests": 72001,
+      "p50_ms": 1.35,
+      "p95_ms": 3.04,
+      "p99_ms": 19.65,
+      "max_ms": 137.32,
+      "error_rate": 0,
+      "dropped_iterations": 0,
+      "cpu_m": {
+        "recommender-kserve-predictor-6d8b9f848b-2qtmp": 709,
+        "recommender-kserve-predictor-6d8b9f848b-b9n79": 705
+      },
+      "memory_stall_share": 0.00035,
+      "passed": true,
+      "valid": true,
+      "attempt": 1
+    }
+  ],
+  "seconds_to_ready": {
+    "plain": 7.0,
+    "kserve": 8.0
+  },
+  "vm_memory_after": {
+    "available_mib": 3769,
+    "swap_used_mib": 1023
+  },
+  "finished_utc": "2026-11-02T17:19:07+00:00"
+}

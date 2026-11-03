@@ -1,5 +1,5 @@
 {
-  "started_utc": "2026-11-02T16:18:37+00:00",
+  "started_utc": "2026-11-02T17:22:25+00:00",
   "kubernetes": "v1.37.0",
   "ready": {
     "passed": true,
@@ -9,41 +9,43 @@
       "/api/explain/readyz": 200
     },
     "pods": [
-      "explainer-678656b764-77fz7",
-      "explainer-678656b764-nphbn",
-      "frontend-65dd9d994c-cgbql",
-      "frontend-65dd9d994c-wwglq",
-      "recommender-699b8b8d94-k5fpm",
-      "recommender-699b8b8d94-tpqgm"
+      "explainer-7445f664fd-d7wht",
+      "explainer-7445f664fd-zgn6d",
+      "frontend-f4b687995-bmwmp",
+      "frontend-f4b687995-vd5rw",
+      "recommender-678488894c-9q8xr",
+      "recommender-678488894c-tft6g",
+      "recommender-kserve-predictor-6d8b9f848b-b9n79",
+      "recommender-kserve-predictor-6d8b9f848b-q8czp"
     ]
   },
   "self_healing": {
     "passed": true,
-    "deleted": "recommender-699b8b8d94-k5fpm",
+    "deleted": "recommender-678488894c-9q8xr",
     "pods_before": [
-      "recommender-699b8b8d94-k5fpm",
-      "recommender-699b8b8d94-tpqgm"
+      "recommender-678488894c-9q8xr",
+      "recommender-678488894c-tft6g"
     ],
     "pods_after": [
-      "recommender-699b8b8d94-fwdjq",
-      "recommender-699b8b8d94-tpqgm"
+      "recommender-678488894c-dr2pz",
+      "recommender-678488894c-tft6g"
     ],
-    "seconds_to_full": 8.4
+    "seconds_to_full": 10.5
   },
   "rollout": {
     "passed": true,
-    "tag": "d8c720b-1793636317",
+    "tag": "bb493aa-1793640145",
     "images": {
-      "recommender": "reel-history/recommender:d8c720b-1793636317",
-      "explainer": "reel-history/explainer:d8c720b-1793636317",
-      "frontend": "reel-history/frontend:d8c720b-1793636317"
+      "recommender": "reel-history/recommender:bb493aa-1793640145",
+      "explainer": "reel-history/explainer:bb493aa-1793640145",
+      "frontend": "reel-history/frontend:bb493aa-1793640145"
     },
-    "requests": 41791,
+    "requests": 49723,
     "failed": 0,
     "failures": [],
-    "load_seconds": 30.9,
+    "load_seconds": 31.3,
     "load_threads": 4
   },
   "passed": true,
-  "finished_utc": "2026-11-02T16:19:40+00:00"
+  "finished_utc": "2026-11-02T17:23:17+00:00"
 }

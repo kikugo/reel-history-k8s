@@ -46,14 +46,24 @@ export const options = {
   },
 };
 
+// TARGET=plain (default): the FastAPI recommender behind the gateway.
+// TARGET=kserve: the same model as a KServe InferenceService (v1 protocol), routed by Host.
+const TARGET = __ENV.TARGET || 'plain';
+const KSERVE_HOST = __ENV.KSERVE_HOST || 'recommender-kserve-reel-history.kserve.local';
+
 export default function () {
   const n = 1 + ((__VU * 7 + __ITER) % 20);
   const start = (__VU * 31 + __ITER * 13) % (POOL.length - n);
-  const body = JSON.stringify({ liked: POOL.slice(start, start + n), k: 10 });
-  const res = http.post(`${BASE}/api/rec/recommend`, body, {
-    headers: { 'Content-Type': 'application/json' },
-    timeout: '10s',
-  });
+  const request = { liked: POOL.slice(start, start + n), k: 10 };
+  const res = TARGET === 'kserve'
+    ? http.post(`${BASE}/v1/models/recommender:predict`, JSON.stringify({ instances: [request] }), {
+        headers: { 'Content-Type': 'application/json', Host: KSERVE_HOST },
+        timeout: '10s',
+      })
+    : http.post(`${BASE}/api/rec/recommend`, JSON.stringify(request), {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: '10s',
+      });
   check(res, { 'status 200': (r) => r.status === 200 });
 }
 

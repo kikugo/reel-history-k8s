@@ -3,6 +3,7 @@
 #   make k8s-delete helm-install                      # same app from the Helm chart
 #   make check                                        # the Phase 5 done-when checks
 #   make monitoring grafana                           # Prometheus + Grafana (Phase 6)
+#   make kserve kserve-deploy                         # KServe comparison (Phase 7)
 
 CLUSTER        ?= reel-history
 NAMESPACE      ?= reel-history
@@ -12,9 +13,11 @@ SERVICES       := recommender explainer frontend
 ENVOY_GATEWAY  := v1.9.3
 METRICS_SERVER := 3.14.0
 KPS            := 92.17.0
+CERT_MANAGER   := v1.21.3
+KSERVE         := v0.21.0
 
 .PHONY: kind-up kind-down platform images secrets k8s-validate k8s-apply k8s-delete \
-        helm-lint helm-template helm-install check monitoring grafana prometheus
+        helm-lint helm-template helm-install check monitoring grafana prometheus kserve kserve-deploy
 
 kind-up:
 	kind get clusters | grep -qx $(CLUSTER) || kind create cluster --config kind/cluster.yaml
@@ -89,3 +92,19 @@ grafana:
 # Prometheus on http://localhost:19090 (9090 is often taken by other local stacks)
 prometheus:
 	kubectl -n monitoring port-forward svc/kps-kube-prometheus-stack-prometheus 19090:9090
+
+# cert-manager (KServe's webhook certificates) and KServe in Standard mode
+kserve:
+	helm upgrade --install cert-manager oci://quay.io/jetstack/charts/cert-manager --version $(CERT_MANAGER) \
+		-n cert-manager --create-namespace --set crds.enabled=true --wait --timeout 10m
+	helm upgrade --install kserve-crd oci://ghcr.io/kserve/charts/kserve-crd --version $(KSERVE) -n kserve \
+		--create-namespace --wait
+	helm upgrade --install kserve oci://ghcr.io/kserve/charts/kserve-resources --version $(KSERVE) -n kserve \
+		-f k8s/platform/kserve-values.yaml --wait --timeout 10m
+
+# the KServe predictor image (built from services/ so it reuses the recommender package) + the ISVC
+kserve-deploy:
+	docker build -t reel-history/kserve-predictor:$(TAG) -f services/kserve-predictor/Dockerfile services
+	kind load docker-image --name $(CLUSTER) reel-history/kserve-predictor:$(TAG)
+	kubectl apply -f k8s/kserve/inferenceservice.yaml
+	kubectl -n $(NAMESPACE) wait --for=condition=Ready inferenceservice/recommender-kserve --timeout=10m

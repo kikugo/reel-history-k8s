@@ -1,0 +1,16 @@
+[project]
+name = "kserve-predictor"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+# the KServe SDK serves the same GRU4Rec + FAISS code as services/recommender
+dependencies = [
+    "kserve==0.21.0",
+    "numpy>=2.2",
+    "pandas>=2.2",
+    "onnxruntime>=1.23",
+    "faiss-cpu>=1.12",
+    "huggingface_hub>=1.0",
+]
+
+[tool.uv]
+package = false
