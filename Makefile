@@ -4,6 +4,7 @@
 #   make check                                        # the Phase 5 done-when checks
 #   make monitoring grafana                           # Prometheus + Grafana (Phase 6)
 #   make kserve kserve-deploy                         # KServe comparison (Phase 7)
+#   make aks-plan aks-apply ... aks-destroy           # AKS (Phase 8); creates PAID resources, destroy same day
 
 CLUSTER        ?= reel-history
 NAMESPACE      ?= reel-history
@@ -15,9 +16,12 @@ METRICS_SERVER := 3.14.0
 KPS            := 92.17.0
 CERT_MANAGER   := v1.21.3
 KSERVE         := v0.21.0
+TF             := terraform -chdir=infra/aks
+AKS_TAG        ?= $(shell git rev-parse --short HEAD)
 
 .PHONY: kind-up kind-down platform images secrets k8s-validate k8s-apply k8s-delete \
-        helm-lint helm-template helm-install check monitoring grafana prometheus kserve kserve-deploy
+        helm-lint helm-template helm-install check monitoring grafana prometheus kserve kserve-deploy \
+        aks-validate aks-plan aks-apply aks-credentials aks-images aks-platform aks-deploy aks-smoke aks-destroy
 
 kind-up:
 	kind get clusters | grep -qx $(CLUSTER) || kind create cluster --config kind/cluster.yaml
@@ -108,3 +112,51 @@ kserve-deploy:
 	kind load docker-image --name $(CLUSTER) reel-history/kserve-predictor:$(TAG)
 	kubectl apply -f k8s/kserve/inferenceservice.yaml
 	kubectl -n $(NAMESPACE) wait --for=condition=Ready inferenceservice/recommender-kserve --timeout=10m
+
+# ---- AKS (Phase 8). aks-apply creates paid Azure resources: run aks-destroy the same day. ----
+aks-validate:
+	$(TF) fmt -check
+	$(TF) init -input=false
+	$(TF) validate
+
+# reads Azure, creates nothing; saves the plan that aks-apply applies, so what was reviewed is what runs
+aks-plan:
+	$(TF) init -input=false
+	$(TF) plan -input=false -var subscription_id=$$(az account show --query id -o tsv) -out=aks.tfplan
+
+aks-apply:
+	$(TF) apply -input=false aks.tfplan
+
+aks-credentials:
+	$$($(TF) output -raw get_credentials_command)
+	kubectl config current-context
+
+# built here for linux/amd64 (AKS nodes) and pushed with your Entra login: Azure for Students
+# subscriptions can't run ACR Tasks (az acr build), and the registry has no admin user
+aks-images:
+	az acr login --name $$($(TF) output -raw acr_name)
+	for s in $(SERVICES); do \
+		docker buildx build --platform linux/amd64 --push \
+			-t $$($(TF) output -raw image_repository)/$$s:$(AKS_TAG) services/$$s || exit 1; \
+	done
+
+# AKS ships metrics-server; only Envoy Gateway and the GatewayClass are needed
+aks-platform:
+	helm upgrade --install eg oci://docker.io/envoyproxy/gateway-helm --version $(ENVOY_GATEWAY) \
+		-n envoy-gateway-system --create-namespace --wait
+	kubectl wait --timeout=5m -n envoy-gateway-system deployment/envoy-gateway --for=condition=Available
+	kubectl apply -f k8s/platform/gatewayclass.yaml
+
+aks-deploy:
+	helm upgrade --install reel-history $(CHART) -n $(NAMESPACE) --create-namespace \
+		-f $(CHART)/values-aks.yaml \
+		--set image.repository=$$($(TF) output -raw image_repository) --set image.tag=$(AKS_TAG) \
+		--wait --timeout 10m
+
+aks-smoke:
+	uv run python scripts/aks_smoke.py --image-tag $(AKS_TAG)
+
+# THE IMPORTANT ONE: removes everything (cluster, nodes, disks, load balancer, IP, registry)
+aks-destroy:
+	$(TF) destroy -input=false -auto-approve -var subscription_id=$$(az account show --query id -o tsv)
+	uv run python scripts/aks_smoke.py --record-destroy
