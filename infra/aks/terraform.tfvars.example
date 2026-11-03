@@ -1,0 +1,4 @@
+# cp terraform.tfvars.example terraform.tfvars (gitignored) or export TF_VAR_subscription_id
+subscription_id = "00000000-0000-0000-0000-000000000000"
+# location        = "swedencentral"
+# node_count      = 2

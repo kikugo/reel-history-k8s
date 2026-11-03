@@ -18,3 +18,10 @@ results/quant/*_smoke.json
 # downloaded source data
 data/raw/
 results/bench/*_smoke.json
+
+# Terraform: state and real variable files stay local; the provider lock file is committed
+infra/**/.terraform/
+infra/**/*.tfstate
+infra/**/*.tfstate.*
+infra/**/*.tfvars
+infra/**/*.tfplan
