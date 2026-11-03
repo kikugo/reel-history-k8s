@@ -24,6 +24,7 @@ dev = [
     # the Phase 7 KServe predictor (pins pandas < 3 for the test env; the recommender image keeps its own lock)
     "kserve==0.21.0",
     "pyyaml>=6.0.3",
+    "python-hcl2>=8.1.4",
 ]
 
 [tool.pytest.ini_options]
