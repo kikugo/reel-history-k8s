@@ -1,0 +1,75 @@
+# Manual deploy to AKS: only works while the Phase 8 cluster exists (make aks-apply), and stops
+# before touching anything if it doesn't. Logs in with OIDC; the IDs come from repo secrets only.
+# One-time setup (federated credential + secrets) is in the README, "Deploy to AKS from CI".
+name: deploy-aks
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to build and deploy (a git SHA, 7-40 hex characters). Empty: this commit."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  RESOURCE_GROUP: rg-reel-history-aks
+  CLUSTER: aks-reel-history
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: validate the image tag
+        id: tag
+        env:
+          INPUT_TAG: ${{ inputs.image_tag }}
+        run: |
+          tag="${INPUT_TAG:-${GITHUB_SHA::7}}"
+          if [[ ! "$tag" =~ ^[0-9a-f]{7,40}$ ]]; then
+            echo "::error::image_tag must be 7-40 lowercase hex characters (a git SHA)"; exit 1
+          fi
+          echo "value=$tag" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: the cluster must exist
+        run: |
+          if ! az aks show -g "$RESOURCE_GROUP" -n "$CLUSTER" --query name -o tsv >/dev/null 2>&1; then
+            msg="AKS cluster $CLUSTER doesn't exist; run make aks-apply first (and make aks-destroy the same day)."
+            echo "::error::$msg"; echo "$msg" >> "$GITHUB_STEP_SUMMARY"; exit 1
+          fi
+      - name: build and push images to the cluster's ACR
+        env:
+          TAG: ${{ steps.tag.outputs.value }}
+        run: |
+          acr=$(az acr list -g "$RESOURCE_GROUP" --query "[0].name" -o tsv)
+          az acr login --name "$acr"
+          repo="$(az acr show -n "$acr" --query loginServer -o tsv)/reel-history"
+          echo "REPO=$repo" >> "$GITHUB_ENV"
+          for s in recommender explainer frontend; do
+            docker build -t "$repo/$s:$TAG" "services/$s"
+            docker push "$repo/$s:$TAG"
+          done
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: credentials, platform, chart
+        env:
+          TAG: ${{ steps.tag.outputs.value }}
+        run: |
+          az aks get-credentials -g "$RESOURCE_GROUP" -n "$CLUSTER" --overwrite-existing
+          make aks-platform
+          helm upgrade --install reel-history charts/reel-history -n reel-history --create-namespace \
+            -f charts/reel-history/values-aks.yaml \
+            --set image.repository="$REPO" --set image.tag="$TAG" --wait --timeout 10m
+      - name: smoke test
+        env:
+          TAG: ${{ steps.tag.outputs.value }}
+        run: uv run python scripts/aks_smoke.py --image-tag "$TAG"
