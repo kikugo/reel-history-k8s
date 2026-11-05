@@ -263,3 +263,30 @@ make aks-smoke                # pods Ready and spread, public endpoints, self-he
 ```
 
 **`make aks-destroy`: run it the same day.** It removes the cluster, nodes, disks, load balancer, public IP and registry, then records that `rg-reel-history-aks` no longer exists.
+
+### Part 2: CI/CD (Phase 9)
+
+`.github/workflows/`, with every action pinned to a commit SHA:
+
+- `ci.yml`, on every PR and push to `main`:
+  - ruff, pytest, the Helm chart checks and `terraform validate`
+  - a build of every Dockerfile
+  - a kind cluster created from `kind/cluster.yaml`, with the platform and the chart installed, then `scripts/ci_smoke.sh`: every service's `/healthz` and `/readyz` through the gateway, one recommendation and one explanation
+- `release.yml`: on a `v*` tag, pushes the three app images to GHCR (`ghcr.io/kikugo/reel-history-<service>`), tagged with the git SHA, the short SHA and the version.
+- `deploy-aks.yml`: run by hand. It logs in to Azure with OIDC, stops if the AKS cluster doesn't exist, then builds and pushes the images to the cluster's registry, runs `helm upgrade` with `values-aks.yaml` and runs the AKS smoke test.
+
+`make lint-workflows` runs actionlint locally.
+
+**Deploy to AKS from CI, one-time setup.** It creates an identity in your Entra tenant, so run it yourself, once:
+
+```bash
+app=$(az ad app create --display-name reel-history-github --query appId -o tsv)
+az ad sp create --id "$app"
+az ad app federated-credential create --id "$app" --parameters '{"name":"main","issuer":"https://token.actions.githubusercontent.com","subject":"repo:kikugo/reel-history-k8s:ref:refs/heads/main","audiences":["api://AzureADTokenExchange"]}'
+az role assignment create --assignee "$app" --role Contributor --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-reel-history-aks"
+gh secret set AZURE_CLIENT_ID --body "$app"
+gh secret set AZURE_TENANT_ID --body "$(az account show --query tenantId -o tsv)"
+gh secret set AZURE_SUBSCRIPTION_ID --body "$(az account show --query id -o tsv)"
+```
+
+The role assignment needs the resource group, so run it after `make aks-apply`. It disappears with `make aks-destroy`, so the CI identity only has access while the cluster exists.
