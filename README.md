@@ -246,3 +246,20 @@ The same GRU4Rec + FAISS code served two ways, 2 pods each, same resources, behi
 <!-- KSERVE:END -->
 
 **Which I'd choose here: the plain Deployment.** At the same replicas and resources the two serve the same results at the same latency, so KServe's serving layer costs nothing per request. It does cost a bigger image and a controller, cert-manager and their CRDs in every cluster. For one small CPU model behind an existing gateway, that buys little. KServe earns its place with many models or teams, canary rollouts between model versions, the standard v1/v2 inference protocols, inference graphs, or GPU/LLM serving, none of which this project needs (the LLM already runs on vLLM on Modal). The AKS chart in Phase 8 stays on plain Deployments.
+
+### Part 2: on AKS with Terraform (Phase 8)
+
+`infra/aks` creates one resource group holding an AKS cluster (Free control-plane tier, one node pool sized to the student subscription's vCPU quota, Azure CNI overlay) and an Azure Container Registry. The cluster's kubelet identity gets `AcrPull` on that registry only, and the registry has no admin user. The same Helm chart deploys with `values-aks.yaml`, where Envoy Gateway sits behind an Azure load balancer. `scripts/aks_smoke.py` records the run in `results/aks/smoke.json`.
+
+Runbook (creates paid resources; destroy the same day):
+
+```bash
+make aks-plan                 # read-only: review what will be created
+make aks-apply                # creates the resource group, AKS and ACR (paid from here on)
+make aks-credentials          # az aks get-credentials, switches kubectl to the cluster
+make aks-images               # builds linux/amd64 images here and pushes them to ACR
+make aks-platform aks-deploy  # Envoy Gateway, then the chart with values-aks.yaml
+make aks-smoke                # pods Ready and spread, public endpoints, self-healing
+```
+
+**`make aks-destroy`: run it the same day.** It removes the cluster, nodes, disks, load balancer, public IP and registry, then records that `rg-reel-history-aks` no longer exists.
