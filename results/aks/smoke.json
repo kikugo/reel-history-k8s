@@ -1,0 +1,46 @@
+{
+  "started_utc": "2026-11-03T01:45:17+00:00",
+  "nodes": 2,
+  "node_vm_size": "Standard_B2s_v2",
+  "region": "swedencentral",
+  "kubernetes": "v1.37.1",
+  "context": "aks-reel-history",
+  "seconds_to_ready": 2.0,
+  "pods_per_node": [
+    5,
+    1
+  ],
+  "spread_ok": true,
+  "explain_source": "template",
+  "checks": {
+    "frontend": true,
+    "recommender_ready": true,
+    "explainer_ready": true,
+    "recommend_gru4rec": true,
+    "explain": true
+  },
+  "self_healing": {
+    "passed": true,
+    "deleted": "recommender-56959f9c74-7t9w6",
+    "pods_before": [
+      "recommender-56959f9c74-7t9w6",
+      "recommender-56959f9c74-q8nhs"
+    ],
+    "pods_after": [
+      "recommender-56959f9c74-44bmm",
+      "recommender-56959f9c74-q8nhs"
+    ],
+    "seconds_to_full": 10.1
+  },
+  "images": [
+    "explainer:d9ec580",
+    "frontend:d9ec580",
+    "nginx-prometheus-exporter:1.5.1",
+    "recommender:d9ec580"
+  ],
+  "image_tag": "d9ec580",
+  "passed": true,
+  "finished_utc": "2026-11-03T01:45:31+00:00",
+  "destroyed_utc": "2026-11-05T16:08:42+00:00",
+  "resource_group_exists_after_destroy": false
+}
