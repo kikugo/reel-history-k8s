@@ -124,3 +124,17 @@ def test_smoke_spread_helpers():
     assert smoke.spread_ok({"a": 2, "b": 1}, nodes=2)
     assert not smoke.spread_ok({"a": 6}, nodes=2)
     assert smoke.spread_ok({"a": 6}, nodes=1)
+
+
+def test_all_digit_git_sha_renders_as_a_string_tag():
+    """A short SHA like 4570436 arrives from --set as a number; the image must still be ...:4570436."""
+    if shutil.which("helm") is None:
+        pytest.skip("helm not installed")
+    chart = ROOT / "charts" / "reel-history"
+    out = subprocess.run(["helm", "template", "reel-history", str(chart), "-f", str(chart / "values-aks.yaml"),
+                          "--set", "image.repository=example.azurecr.io/reel-history", "--set", "image.tag=4570436"],
+                         check=True, capture_output=True, text=True).stdout
+    assert "%!s(int64" not in out
+    assert "image: example.azurecr.io/reel-history/recommender:4570436" in out
+    makefile = (ROOT / "Makefile").read_text()
+    assert "--set image.tag=" not in makefile and "--set-string image.tag=" in makefile
