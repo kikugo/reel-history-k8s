@@ -21,7 +21,8 @@ AKS_TAG        ?= $(shell git rev-parse --short HEAD)
 
 .PHONY: kind-up kind-down platform images secrets k8s-validate k8s-apply k8s-delete \
         helm-lint helm-template helm-install check monitoring grafana prometheus kserve kserve-deploy \
-        aks-validate aks-plan aks-apply aks-credentials aks-images aks-platform aks-deploy aks-smoke aks-destroy
+        aks-validate aks-plan aks-apply aks-credentials aks-images aks-platform aks-deploy aks-smoke aks-destroy \
+        lint-workflows
 
 kind-up:
 	kind get clusters | grep -qx $(CLUSTER) || kind create cluster --config kind/cluster.yaml
@@ -160,3 +161,7 @@ aks-smoke:
 aks-destroy:
 	$(TF) destroy -input=false -auto-approve -var subscription_id=$$(az account show --query id -o tsv)
 	uv run python scripts/aks_smoke.py --record-destroy
+
+# actionlint (with shellcheck) on .github/workflows, from its Docker image
+lint-workflows:
+	docker run --rm -v "$$PWD:/repo" -w /repo rhysd/actionlint:1.7.12 -no-color
