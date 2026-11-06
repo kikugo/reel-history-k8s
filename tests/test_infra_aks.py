@@ -138,3 +138,16 @@ def test_all_digit_git_sha_renders_as_a_string_tag():
     assert "image: example.azurecr.io/reel-history/recommender:4570436" in out
     makefile = (ROOT / "Makefile").read_text()
     assert "--set image.tag=" not in makefile and "--set-string image.tag=" in makefile
+
+
+def test_ci_identity_gets_least_privilege_roles_only_with_the_cluster():
+    ci = RES[("azurerm_role_assignment", "ci")]
+    assert ci["principal_id"] == "${var.ci_principal_id}"
+    text = (TF / "main.tf").read_text()
+    for role in ('"Reader"', '"Azure Kubernetes Service Cluster User Role"', '"AcrPush"'):
+        assert role in text, role
+    assert "Contributor" not in text and "Owner" not in text
+    assert 'var.ci_principal_id == "" ? {}' in text  # no identity, no assignments
+    assert default("ci_principal_id") == ""
+    makefile = (ROOT / "Makefile").read_text()
+    assert makefile.count("-var ci_principal_id=$(CI_PRINCIPAL)") == 2  # plan and destroy

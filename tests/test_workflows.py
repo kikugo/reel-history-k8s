@@ -66,7 +66,12 @@ def test_deploy_aks_is_manual_oidc_validated_and_checks_the_cluster_first():
     assert list(wf["on"]) == ["workflow_dispatch"]
     ordered = steps(wf)
     login = next(s for s in ordered if "azure/login" in s.get("uses", ""))
-    assert all(v.startswith("${{ secrets.AZURE_") for v in login["with"].values())
+    ids = {k: v for k, v in login["with"].items() if isinstance(v, str)}
+    assert ids and all(v.startswith("${{ secrets.AZURE_") for v in ids.values())
+    # the identity has no roles unless a cluster exists, so login must not require a subscription
+    assert login["with"]["allow-no-subscriptions"] is True and "subscription-id" not in login["with"]
+    check = next(s for s in ordered if s.get("name") == "the cluster must exist")
+    assert check["env"] == {"SUBSCRIPTION": "${{ secrets.AZURE_SUBSCRIPTION_ID }}"}
     names = [s.get("name", s.get("uses", "")) for s in ordered]
     assert names.index("validate the image tag") == 0
     assert names.index("the cluster must exist") < names.index("build and push images to the cluster's ACR")
