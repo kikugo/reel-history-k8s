@@ -277,16 +277,15 @@ make aks-smoke                # pods Ready and spread, public endpoints, self-he
 
 `make lint-workflows` runs actionlint locally.
 
-**Deploy to AKS from CI, one-time setup.** It creates an identity in your Entra tenant, so run it yourself, once:
+**Deploy to AKS from CI, one-time setup** (already done for this repo). It creates an app with no secret in your Entra tenant, trusted only for this repo's `main` branch:
 
 ```bash
 app=$(az ad app create --display-name reel-history-github --query appId -o tsv)
 az ad sp create --id "$app"
 az ad app federated-credential create --id "$app" --parameters '{"name":"main","issuer":"https://token.actions.githubusercontent.com","subject":"repo:kikugo/reel-history-k8s:ref:refs/heads/main","audiences":["api://AzureADTokenExchange"]}'
-az role assignment create --assignee "$app" --role Contributor --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-reel-history-aks"
 gh secret set AZURE_CLIENT_ID --body "$app"
 gh secret set AZURE_TENANT_ID --body "$(az account show --query tenantId -o tsv)"
 gh secret set AZURE_SUBSCRIPTION_ID --body "$(az account show --query id -o tsv)"
 ```
 
-The role assignment needs the resource group, so run it after `make aks-apply`. It disappears with `make aks-destroy`, so the CI identity only has access while the cluster exists.
+It holds no Azure roles on its own. `make aks-plan` looks up its object ID, and Terraform grants it Reader on the resource group, Cluster User on AKS and AcrPush on the registry. Those go away with `make aks-destroy`, so the CI identity can only deploy while a cluster exists.
