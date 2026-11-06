@@ -12,6 +12,10 @@ image:
 # preStopSleepSeconds keeps a terminating pod serving while Envoy drops its endpoint.
 preStopSleepSeconds: 5
 
+# spreadAcrossNodes asks the scheduler to keep each Deployment's pods balanced across nodes
+# (max skew 1). ScheduleAnyway: a single-node cluster such as kind still schedules everything.
+spreadAcrossNodes: true
+
 # services holds one entry per Deployment + Service, keyed by name.
 services:
   recommender:

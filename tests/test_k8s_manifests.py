@@ -141,3 +141,11 @@ def test_kind_maps_the_gateway_nodeport():
     cluster = yaml.safe_load((ROOT / "kind" / "cluster.yaml").read_text())
     (mapping,) = cluster["nodes"][0]["extraPortMappings"]
     assert mapping["containerPort"] == 30080 and mapping["hostPort"] == 8088 and mapping["listenAddress"] == "127.0.0.1"
+
+
+def test_deployments_spread_across_nodes(docs):
+    for name, dep in by_kind(docs, "Deployment").items():
+        (tsc,) = dep["spec"]["template"]["spec"]["topologySpreadConstraints"]
+        assert tsc["topologyKey"] == "kubernetes.io/hostname" and tsc["maxSkew"] == 1, name
+        assert tsc["whenUnsatisfiable"] == "ScheduleAnyway", name  # never blocks a one-node cluster
+        assert tsc["labelSelector"]["matchLabels"] == dep["spec"]["selector"]["matchLabels"], name
