@@ -17,6 +17,8 @@ KPS            := 92.17.0
 CERT_MANAGER   := v1.21.3
 KSERVE         := v0.21.0
 TF             := terraform -chdir=infra/aks
+# object ID of the GitHub Actions identity (empty if it doesn't exist); Terraform grants it deploy rights
+CI_PRINCIPAL    = $$(az ad sp list --display-name reel-history-github --query '[0].id' -o tsv)
 AKS_TAG        ?= $(shell git rev-parse --short HEAD)
 
 .PHONY: kind-up kind-down platform images secrets k8s-validate k8s-apply k8s-delete \
@@ -123,7 +125,8 @@ aks-validate:
 # reads Azure, creates nothing; saves the plan that aks-apply applies, so what was reviewed is what runs
 aks-plan:
 	$(TF) init -input=false
-	$(TF) plan -input=false -var subscription_id=$$(az account show --query id -o tsv) -out=aks.tfplan
+	$(TF) plan -input=false -var subscription_id=$$(az account show --query id -o tsv) \
+		-var ci_principal_id=$(CI_PRINCIPAL) -out=aks.tfplan
 
 aks-apply:
 	$(TF) apply -input=false aks.tfplan
@@ -159,7 +162,8 @@ aks-smoke:
 
 # THE IMPORTANT ONE: removes everything (cluster, nodes, disks, load balancer, IP, registry)
 aks-destroy:
-	$(TF) destroy -input=false -auto-approve -var subscription_id=$$(az account show --query id -o tsv)
+	$(TF) destroy -input=false -auto-approve -var subscription_id=$$(az account show --query id -o tsv) \
+		-var ci_principal_id=$(CI_PRINCIPAL)
 	uv run python scripts/aks_smoke.py --record-destroy
 
 # actionlint (with shellcheck) on .github/workflows, from its Docker image
