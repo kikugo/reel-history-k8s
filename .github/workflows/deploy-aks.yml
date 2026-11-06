@@ -35,14 +35,19 @@ jobs:
           fi
           echo "value=$tag" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The identity only holds roles while the cluster exists (Terraform grants them with it), so
+      # log in without requiring a visible subscription and decide in the next step.
       - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          allow-no-subscriptions: true
       - name: the cluster must exist
+        env:
+          SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         run: |
-          if ! az aks show -g "$RESOURCE_GROUP" -n "$CLUSTER" --query name -o tsv >/dev/null 2>&1; then
+          if ! az account set --subscription "$SUBSCRIPTION" 2>/dev/null \
+            || ! az aks show -g "$RESOURCE_GROUP" -n "$CLUSTER" --query name -o tsv >/dev/null 2>&1; then
             msg="AKS cluster $CLUSTER doesn't exist; run make aks-apply first (and make aks-destroy the same day)."
             echo "::error::$msg"; echo "$msg" >> "$GITHUB_STEP_SUMMARY"; exit 1
           fi
