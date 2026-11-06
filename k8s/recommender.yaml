@@ -38,6 +38,14 @@ spec:
         app.kubernetes.io/name: recommender
         app.kubernetes.io/part-of: reel-history
     spec:
+      # keep replicas balanced across nodes; ScheduleAnyway so one-node kind still schedules them
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: recommender
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
