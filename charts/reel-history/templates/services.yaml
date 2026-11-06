@@ -45,6 +45,15 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       terminationGracePeriodSeconds: {{ $svc.terminationGracePeriodSeconds }}
+      {{- if $.Values.spreadAcrossNodes }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "rh.selector" (list $ $name) | nindent 14 }}
+      {{- end }}
       {{- if $svc.fetchArtifacts.enabled }}
       initContainers:
         - name: fetch-artifacts
