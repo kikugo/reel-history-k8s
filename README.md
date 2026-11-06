@@ -282,7 +282,9 @@ make aks-smoke                # pods Ready and spread, public endpoints, self-he
 ```bash
 app=$(az ad app create --display-name reel-history-github --query appId -o tsv)
 az ad sp create --id "$app"
-az ad app federated-credential create --id "$app" --parameters '{"name":"main","issuer":"https://token.actions.githubusercontent.com","subject":"repo:kikugo/reel-history-k8s:ref:refs/heads/main","audiences":["api://AzureADTokenExchange"]}'
+# the repo uses GitHub's immutable subject (owner and repo IDs in the token), so read the exact prefix
+prefix=$(gh api repos/kikugo/reel-history-k8s/actions/oidc/customization/sub --jq .sub_claim_prefix)
+az ad app federated-credential create --id "$app" --parameters "{\"name\":\"main\",\"issuer\":\"https://token.actions.githubusercontent.com\",\"subject\":\"${prefix}:ref:refs/heads/main\",\"audiences\":[\"api://AzureADTokenExchange\"]}"
 gh secret set AZURE_CLIENT_ID --body "$app"
 gh secret set AZURE_TENANT_ID --body "$(az account show --query tenantId -o tsv)"
 gh secret set AZURE_SUBSCRIPTION_ID --body "$(az account show --query id -o tsv)"
