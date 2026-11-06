@@ -4,7 +4,7 @@
 app.kubernetes.io/name: {{ index . 1 }}
 app.kubernetes.io/part-of: reel-history
 app.kubernetes.io/instance: {{ $root.Release.Name }}
-app.kubernetes.io/version: {{ $root.Values.image.tag | quote }}
+app.kubernetes.io/version: {{ $root.Values.image.tag | toString | quote }}
 app.kubernetes.io/managed-by: {{ $root.Release.Service }}
 helm.sh/chart: {{ printf "%s-%s" $root.Chart.Name $root.Chart.Version }}
 {{- end }}
@@ -17,7 +17,8 @@ app.kubernetes.io/instance: {{ (index . 0).Release.Name }}
 
 {{- define "rh.image" -}}
 {{- $root := index . 0 -}}
-{{ printf "%s/%s:%s" $root.Values.image.repository (index . 1) $root.Values.image.tag }}
+{{- /* toString: an all-digit git SHA such as 4570436 arrives from --set as a number */ -}}
+{{ printf "%s/%s:%s" $root.Values.image.repository (index . 1) (toString $root.Values.image.tag) }}
 {{- end }}
 
 {{- define "rh.containerSecurity" -}}
