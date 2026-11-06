@@ -48,3 +48,9 @@ variable "os_disk_size_gb" {
   type        = number
   default     = 32
 }
+
+variable "ci_principal_id" {
+  description = "Object ID of the GitHub Actions service principal (reel-history-github). When set, it gets just enough access to deploy while the cluster exists; empty skips it."
+  type        = string
+  default     = ""
+}

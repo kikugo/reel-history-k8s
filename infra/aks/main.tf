@@ -83,3 +83,21 @@ resource "azurerm_role_assignment" "kubelet_acr_pull" {
   principal_id                     = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
   skip_service_principal_aad_check = true
 }
+
+# The GitHub Actions identity (OIDC, no secret) gets least-privilege access for deploy-aks.yml, only
+# while the cluster exists: these assignments go away with `terraform destroy`.
+locals {
+  ci_roles = var.ci_principal_id == "" ? {} : {
+    reader       = { scope = azurerm_resource_group.aks.id, role = "Reader" }                                         # find the cluster and registry
+    cluster_user = { scope = azurerm_kubernetes_cluster.aks.id, role = "Azure Kubernetes Service Cluster User Role" } # get-credentials
+    acr_push     = { scope = azurerm_container_registry.acr.id, role = "AcrPush" }                                    # push images
+  }
+}
+
+resource "azurerm_role_assignment" "ci" {
+  for_each                         = local.ci_roles
+  scope                            = each.value.scope
+  role_definition_name             = each.value.role
+  principal_id                     = var.ci_principal_id
+  skip_service_principal_aad_check = true
+}
