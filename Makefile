@@ -79,7 +79,7 @@ helm-template:
 
 helm-install:
 	helm upgrade --install reel-history $(CHART) -n $(NAMESPACE) --create-namespace \
-		-f $(CHART)/values-dev.yaml --set image.tag=$(TAG) --wait --timeout 5m
+		-f $(CHART)/values-dev.yaml --set-string image.tag=$(TAG) --wait --timeout 5m
 
 check:
 	uv run python scripts/kind_check.py
@@ -151,7 +151,7 @@ aks-platform:
 aks-deploy:
 	helm upgrade --install reel-history $(CHART) -n $(NAMESPACE) --create-namespace \
 		-f $(CHART)/values-aks.yaml \
-		--set image.repository=$$($(TF) output -raw image_repository) --set image.tag=$(AKS_TAG) \
+		--set image.repository=$$($(TF) output -raw image_repository) --set-string image.tag=$(AKS_TAG) \
 		--wait --timeout 10m
 
 aks-smoke:
