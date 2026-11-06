@@ -68,7 +68,7 @@ jobs:
           make aks-platform
           helm upgrade --install reel-history charts/reel-history -n reel-history --create-namespace \
             -f charts/reel-history/values-aks.yaml \
-            --set image.repository="$REPO" --set image.tag="$TAG" --wait --timeout 10m
+            --set image.repository="$REPO" --set-string image.tag="$TAG" --wait --timeout 10m
       - name: smoke test
         env:
           TAG: ${{ steps.tag.outputs.value }}

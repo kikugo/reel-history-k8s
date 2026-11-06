@@ -1,14 +1,14 @@
 {
-  "started_utc": "2026-11-03T01:45:17+00:00",
+  "started_utc": "2026-11-06T16:47:46+00:00",
   "nodes": 2,
   "node_vm_size": "Standard_B2s_v2",
   "region": "swedencentral",
   "kubernetes": "v1.37.1",
   "context": "aks-reel-history",
-  "seconds_to_ready": 2.0,
+  "seconds_to_ready": 1.6,
   "pods_per_node": [
-    5,
-    1
+    3,
+    3
   ],
   "spread_ok": true,
   "explain_source": "template",
@@ -21,26 +21,26 @@
   },
   "self_healing": {
     "passed": true,
-    "deleted": "recommender-56959f9c74-7t9w6",
+    "deleted": "recommender-f57669797-c2g74",
     "pods_before": [
-      "recommender-56959f9c74-7t9w6",
-      "recommender-56959f9c74-q8nhs"
+      "recommender-f57669797-c2g74",
+      "recommender-f57669797-mhc9b"
     ],
     "pods_after": [
-      "recommender-56959f9c74-44bmm",
-      "recommender-56959f9c74-q8nhs"
+      "recommender-f57669797-6zs56",
+      "recommender-f57669797-mhc9b"
     ],
-    "seconds_to_full": 10.1
+    "seconds_to_full": 9.7
   },
   "images": [
-    "explainer:d9ec580",
-    "frontend:d9ec580",
+    "explainer:4570436",
+    "frontend:4570436",
     "nginx-prometheus-exporter:1.5.1",
-    "recommender:d9ec580"
+    "recommender:4570436"
   ],
-  "image_tag": "d9ec580",
+  "image_tag": "4570436",
   "passed": true,
-  "finished_utc": "2026-11-03T01:45:31+00:00",
-  "destroyed_utc": "2026-11-05T16:08:42+00:00",
+  "finished_utc": "2026-11-06T16:47:59+00:00",
+  "destroyed_utc": "2026-11-06T16:54:34+00:00",
   "resource_group_exists_after_destroy": false
 }
