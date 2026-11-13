@@ -4,6 +4,10 @@ A personal project in two parts. **Part 1** quantizes Qwen3-8B to 4-bit weights 
 
 Models on Hugging Face: [AWQ](https://huggingface.co/karthikcr/Qwen3-8B-W4A16-AWQ) · [GPTQ](https://huggingface.co/karthikcr/Qwen3-8B-W4A16-GPTQ) · [GGUF](https://huggingface.co/karthikcr/Qwen3-8B-GGUF)
 
+The app itself is live as a [Hugging Face Space](https://huggingface.co/spaces/karthikcr/reel-history):
+
+![Reel History landing page: browse the 87,000-film catalog, then drop in a Letterboxd export](docs/images/reel-history-app.webp)
+
 ## Architecture
 
 ```mermaid
